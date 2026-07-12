@@ -1,26 +1,207 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Dark mode driven by [data-theme] attribute (set by ThemeToggle). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  /* Monochrome Zinc — matches hunghuc.work reference */
+  --color-canvas: #ffffff;
+  --color-surface: #fafafa;
+  --color-hover: #f4f4f5;
+  --color-ink: #18181b;
+  --color-ink-soft: #71717a;
+  --color-ink-mute: #a1a1aa;
+  --color-line: #f4f4f5;
+  --color-accent: #2563eb;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-inter), ui-monospace, monospace;
+
+  --sidebar-w: 260px;
+  --sidebar-right-w: 280px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+[data-theme="dark"] {
+  --color-canvas: #09090b;
+  --color-surface: #18181b;
+  --color-hover: #27272a;
+  --color-ink: #fafafa;
+  --color-ink-soft: #a1a1aa;
+  --color-ink-mute: #71717a;
+  --color-line: #27272a;
+  --color-accent: #3b82f6;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Layout helpers ---- */
+.sidebar-w {
+  width: var(--sidebar-w);
+}
+.sidebar-right-w {
+  width: var(--sidebar-right-w);
+}
+
+/* ---- Links ---- */
+a {
+  color: inherit;
+}
+.prose a,
+a.link {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.prose a:hover,
+a.link:hover {
+  text-decoration: underline;
+}
+
+/* ---- Article body (prose) ---- */
+.prose {
+  line-height: 1.75;
+  font-size: 1rem;
+  color: var(--color-ink);
+}
+.prose > * + * {
+  margin-top: 1.1em;
+}
+.prose h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 2em;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 80px;
+}
+.prose h3 {
+  font-size: 1.3rem;
+  font-weight: 650;
+  margin-top: 1.6em;
+  scroll-margin-top: 80px;
+}
+.prose h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1.3em;
+  scroll-margin-top: 80px;
+}
+.prose ul,
+.prose ol {
+  padding-left: 1.4em;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose li + li {
+  margin-top: 0.4em;
+}
+.prose blockquote {
+  border-left: 3px solid var(--color-line);
+  padding-left: 1em;
+  color: var(--color-ink-soft);
+}
+.prose img {
+  border-radius: 12px;
+  border: 1px solid var(--color-line);
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  display: block;
+  overflow-x: auto;
+}
+.prose th,
+.prose td {
+  border: 1px solid var(--color-line);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+.prose th {
+  background: var(--color-surface);
+  font-weight: 600;
+}
+
+/* heading anchor */
+.heading-anchor {
+  margin-left: 0.4em;
+  color: var(--color-ink-mute);
+  opacity: 0;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.prose h2:hover .heading-anchor,
+.prose h3:hover .heading-anchor,
+.prose h4:hover .heading-anchor {
+  opacity: 1;
+}
+
+/* ---- Code (Shiki dual theme) ---- */
+.prose pre,
+pre {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  padding: 1em;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.prose code {
+  font-family: var(--font-mono);
+}
+.prose :not(pre) > code {
+  background: var(--color-hover);
+  border-radius: 6px;
+  padding: 0.15em 0.4em;
+  font-size: 0.875em;
+}
+/* Shiki token colors: light by default, dark under data-theme */
+.prose pre code span {
+  color: var(--shiki-light);
+}
+[data-theme="dark"] .prose pre code span {
+  color: var(--shiki-dark) !important;
+}
+.prose pre {
+  background-color: var(--shiki-light-bg);
+}
+[data-theme="dark"] .prose pre {
+  background-color: var(--shiki-dark-bg) !important;
+}
+
+/* ---- Term dictionary links ---- */
+.term-link {
+  color: var(--color-accent);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+/* ---- Mermaid ---- */
+.mermaid-block {
+  margin: 1.5em 0;
+  display: flex;
+  justify-content: center;
+}
+.mermaid-block pre {
+  display: none;
+}
+
+/* ---- Misc ---- */
+.divider {
+  border: 0;
+  border-top: 1px solid var(--color-line);
 }
