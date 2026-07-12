@@ -1,15 +1,29 @@
-# 🏗️ Implementation Plan v2 — Personal IT Blog
+# 🏗️ Implementation Plan v3 — Personal IT Blog (Template)
+
+## Reference Screenshots
+
+Thiết kế bám sát phiên bản gốc hunghuc.work:
+
+````carousel
+![Home page — 3-column layout, left sidebar nav, activity feed center, newsletter right](/Users/hdduytran/.gemini/antigravity/brain/70b6de6c-b95c-4300-8627-a490cb1ababf/home_reference.png)
+<!-- slide -->
+![Article list — horizontal cards with thumbnails, same 3-column layout](/Users/hdduytran/.gemini/antigravity/brain/70b6de6c-b95c-4300-8627-a490cb1ababf/article_reference.png)
+````
+
+---
 
 ## Decisions Log
 
 | Quyết định | Lựa chọn |
 |---|---|
-| Content Pipeline | Git Submodule — vault riêng, mount vào Next.js repo |
+| Content Pipeline | Git Submodule — Tolaria vault riêng, mount vào Next.js repo |
 | Dark Mode | Light-first, toggle sang dark |
 | Search | Chưa cần (thêm sau khi có nhiều bài) |
 | Mermaid | Có — render mermaid code blocks thành diagrams |
-| Design | Clean minimalist zinc, light-first + dark toggle |
+| Design | **Clean minimalist zinc** — bám sát hunghuc.work (monochrome zinc palette, Inter font, subtle borders) |
 | Ngôn ngữ | Tiếng Việt chính, đôi khi tiếng Anh |
+| Personal Data | **KHÔNG** hardcode trong source — tất cả lấy từ `profile.mdx` trong submodule |
+| Template | Source code là **reusable template** — fork về, thay submodule, chạy |
 | Features bổ sung | RSS, OG Image gen, Reading time, Copy heading link, Social sharing, Back to top, Breadcrumb, Last updated, **Term Dictionary (popup/dialog)** |
 
 ---
@@ -30,42 +44,205 @@
 | **Deploy** | **Vercel** (SSG + ISR, Turbopack builds) | — |
 | **Search (future)** | **Pagefind** (khi cần) | — |
 
-### Tại sao Next.js 16?
+---
 
-- **Turbopack** là default bundler → 2-5x faster builds, 10x faster Fast Refresh
-- **`use cache` directive** → explicit caching thay vì PPR, phù hợp cho static blog + ISR
-- **React 19.2** → View Transitions (page transitions mượt), `<Activity>` component
-- **`proxy.ts`** thay middleware → cleaner architecture
-- **React Compiler** → auto memoization, không cần `useMemo`/`useCallback`
+## User Review Required
 
-### Tại sao Tailwind CSS v4?
+> [!IMPORTANT]
+> **Source code = Template**: Source code blog sẽ **không chứa bất kỳ thông tin cá nhân nào**. Tên blog, avatar, bio, social links, contact info... tất cả được lấy từ file `profile.mdx` trong git submodule. Khi fork template, chỉ cần thay submodule content.
 
-- **Oxide Engine (Rust)** → 5x faster full builds, 100x faster incremental
-- **CSS-native config** → `@theme` blocks thay vì `tailwind.config.js`
-- **No PostCSS/Autoprefixer needed** → built-in Lightning CSS
-- **`@property` support** → smooth dark mode transitions
-- **Container queries** → responsive components không phụ thuộc viewport
+> [!IMPORTANT]
+> **Submodule rendering rules**:
+> - Chỉ render thư mục nằm trong folder `IT/` (Tolaria vault structure)
+> - Chỉ render file `profile.mdx` ở root của submodule
+> - **Bỏ render** các file khác nằm ngoài folder (`architecture.md`, `note.md`, `type.md`, `AGENTS.md`) — đây là Tolaria system files
+> - Term dictionary cũng nằm trong submodule (folder `IT/terms/`)
+
+> [!WARNING]
+> **Cấu trúc submodule hiện tại** chỉ có `content/IT/Architectures/` với 3 bài. Cần tạo thêm cấu trúc folders cho terms, notes, và file `profile.mdx`.
 
 ---
 
-## Project Structure
+## Open Questions
+
+> [!IMPORTANT]
+> 1. **Tolaria Views**: Bạn có muốn tạo Tolaria saved views (`.yml` files trong `views/` folder) để tự động classify content, hay chỉ dựa vào folder structure trong `IT/`?
+> 2. **Sidebar "Views" items**: Bạn muốn các mục Views (giống "Luyên thuyên", "AI x Ecommerce") được **tự động phát hiện** từ Tolaria `views/*.yml` files, hay **hardcode tên** từ `profile.mdx`?
+> 3. **Profile MDX content**: File `profile.mdx` cần chứa những gì ngoài: name, avatar, bio, social links, contact? Ví dụ: newsletter config, custom sidebar items?
+> 4. **Newsletter**: Bạn có muốn giữ newsletter subscribe (sidebar phải) như bản gốc không? Nếu có, newsletter provider nào (Kit.com, Buttondown, etc.)?
+
+---
+
+## Submodule Content Structure
 
 ```
-personal-blog/                          ← Next.js repo
-├── content/                            ← Git submodule → Tolaria vault repo
-│   ├── posts/                          ← Long-form articles
-│   │   ├── architecture/
-│   │   │   ├── apache-apisix.md
-│   │   │   └── voice-agent.md
-│   │   └── ai/
-│   │       └── llm-overview.md
-│   ├── notes/                          ← Short-form notes
-│   │   └── til-2026-07.md
-│   ├── terms/                          ← Term dictionary entries
+content/                              ← Git submodule → Tolaria vault repo
+├── profile.mdx                       ← 🔑 User profile (BẮT BUỘC)
+│
+├── IT/                               ← 📂 Main content root (CHỈ render folder này)
+│   ├── Architectures/                ← Folder level 1 → sidebar nav
+│   │   ├── Apache APISIX.md
+│   │   ├── Voice Agent Architecture.md
+│   │   └── identity-and-access-management.md
+│   ├── AI/                           ← Folder level 1 → sidebar nav
+│   │   └── llm-overview.md
+│   ├── DevOps/                       ← Folder level 1 → sidebar nav
+│   │   └── ...
+│   ├── terms/                        ← 📘 Term dictionary entries
 │   │   ├── api-gateway.md
 │   │   ├── microservices.md
 │   │   └── etcd.md
-│   └── AGENTS.md                       ← Tolaria vault config
+│   └── notes/                        ← 📝 Short-form notes
+│       └── til-2026-07.md
+│
+├── views/                            ← Tolaria saved views (KHÔNG render)
+│   └── *.yml
+├── architecture.md                   ← Tolaria Type (KHÔNG render)
+├── note.md                           ← Tolaria Type (KHÔNG render)
+├── type.md                           ← Tolaria Type (KHÔNG render)
+└── AGENTS.md                         ← Tolaria config (KHÔNG render)
+```
+
+### `profile.mdx` Schema
+
+```mdx
+---
+# Blog Identity
+blog_name: "hunghuc.work"
+blog_tagline: "Blog của Hùng Hà. Ở đây chỉ có Ecom & các thứ xoay quanh Ecom."
+
+# Author Info
+author_name: "Hùng Hà"
+author_display_name: "I'm hùng"
+avatar: "/avatar.jpg"          # path relative to submodule attachments/ or URL
+
+# Social Links
+social:
+  - platform: x
+    url: "https://x.com/username"
+  - platform: facebook
+    url: "https://facebook.com/username"
+  - platform: github
+    url: "https://github.com/username"
+
+# Contact
+email: "hello@example.com"
+
+# Sidebar custom items (under WORK section)
+sidebar_work:
+  - label: "About"
+    icon: "heart"
+    href: "/about"
+  - label: "#WorkWithMe"
+    icon: "globe"
+    href: "#"
+
+# Newsletter (optional)
+newsletter:
+  enabled: true
+  provider: "kit"
+  form_id: "12345"
+  heading: "Thư gửi cuối tuần"
+  description: "Blog này lướt là chính chữ tôi biết cũng đ.ai đọc đâu..."
+  cta: "Subscribe"
+  note: "Mỗi sáng chủ nhật!"
+
+# SEO
+seo:
+  title: "hunghuc.work"
+  description: "Blog về Ecommerce, AI và các thứ xoay quanh"
+  og_image: "/og-default.png"
+---
+
+# Về tôi & hunghuc.work
+
+Nội dung trang About được viết ở đây dưới dạng MDX.
+Có thể dùng React components, images, etc.
+
+## Tại sao lại có hunghuc.work?
+
+(Content trang About...)
+
+## Liên hệ
+
+(Contact info...)
+```
+
+> [!NOTE]
+> Source code blog đọc `profile.mdx` tại build time. Mọi text hiển thị (tên, bio, social links) đều đến từ file này. **Không hardcode** bất cứ thông tin cá nhân nào trong source.
+
+---
+
+## Left Sidebar Hierarchy
+
+Sidebar trái tuân theo thứ tự **chính xác** như bản gốc, nhưng mở rộng với folder navigation:
+
+```
+┌─────────────────────────────────────────────┐
+│  🧑 [Avatar] [Display Name]                 │  ← Từ profile.mdx
+│                                             │
+│  ─────────────────────────────────────────  │
+│                                             │
+│  🏠 Home                                    │  ← Tầng 1: Home (cố định)
+│                                             │
+│  ─────────────────────────────────────────  │
+│                                             │
+│  📋 VIEWS (từ Tolaria views/*.yml)          │  ← Tầng 2: Views
+│     📄 Luyên thuyên              10         │     Mỗi view = 1 nav item
+│     📝 Notes                     22         │     Badge = số bài match filter
+│     🤖 AI x Ecommerce            3         │
+│     💻 Vibe coding               2         │
+│                                             │
+│  ─────────────────────────────────────────  │
+│                                             │
+│  📁 FOLDERS (từ content/IT/*)               │  ← Tầng 3: Folder-based nav
+│     📂 Architectures             3         │     Auto-detect từ IT/ subfolders
+│     📂 AI                        1         │     Exclude: terms/, notes/
+│     📂 DevOps                    0         │     Badge = số file .md trong folder
+│                                             │
+│  ─────────────────────────────────────────  │
+│                                             │
+│  👤 WORK (từ profile.mdx sidebar_work)      │  ← Tầng 4: Writer profile/contact
+│     ❤️  About                               │     Items lấy từ profile.mdx
+│     🌐 #WorkWithMe                          │
+│                                             │
+│  ─────────────────────────────────────────  │
+│                                             │
+│  🏷️ TAGS                                    │  ← Tầng 5: Tags
+│     #mindset  #ai  #marketing              │     Auto-generated từ all posts
+│     #ecommerce  #focus  #ads               │     Click → filter by tag page
+│     #creative  #gu                         │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+### Sidebar data flow
+
+| Tầng | Source | Logic |
+|---|---|---|
+| Avatar + Name | `profile.mdx` → `author_display_name`, `avatar` | Static read at build |
+| Home | Hardcode | Always present |
+| Views | `content/views/*.yml` | Scan `.yml` files, use `name` field, count matching notes |
+| Folders | `content/IT/*/` | Scan top-level dirs inside `IT/`, exclude `terms/`, `notes/`, count `.md` files |
+| Work | `profile.mdx` → `sidebar_work[]` | Static read at build |
+| Tags | All `.md` files in `IT/` | Collect unique tags from frontmatter, deduplicate |
+
+---
+
+## Project Structure (Updated)
+
+```
+personal-blog/                          ← Next.js repo (TEMPLATE — no personal data)
+├── content/                            ← Git submodule → Tolaria vault repo
+│   ├── profile.mdx                     ← 🔑 User profile + About page content
+│   ├── IT/                             ← Content root (chỉ render folder này)
+│   │   ├── Architectures/
+│   │   ├── AI/
+│   │   ├── terms/                      ← Term dictionary
+│   │   └── notes/                      ← Short notes
+│   ├── views/                          ← Tolaria views (sidebar nav items)
+│   │   └── *.yml
+│   └── (other files — KHÔNG render)
 │
 ├── src/
 │   ├── app/
@@ -79,18 +256,16 @@ personal-blog/                          ← Next.js repo
 │   │   │   └── page.tsx                ← Article detail + TOC + Related
 │   │   ├── notes/
 │   │   │   └── page.tsx                ← All notes
-│   │   ├── series/
-│   │   │   ├── page.tsx                ← All series
-│   │   │   └── [slug]/
-│   │   │       └── page.tsx            ← Series landing page
-│   │   ├── category/[slug]/
-│   │   │   └── page.tsx                ← Category page
+│   │   ├── folder/[slug]/
+│   │   │   └── page.tsx                ← Posts filtered by folder
 │   │   ├── tag/[slug]/
 │   │   │   └── page.tsx                ← Tag page
+│   │   ├── view/[slug]/
+│   │   │   └── page.tsx                ← Tolaria view page
 │   │   ├── terms/
-│   │   │   └── page.tsx                ← Dictionary browse page (optional)
+│   │   │   └── page.tsx                ← Dictionary browse page
 │   │   ├── about/
-│   │   │   └── page.tsx                ← About page
+│   │   │   └── page.tsx                ← About page (renders profile.mdx body)
 │   │   ├── rss.xml/
 │   │   │   └── route.ts                ← RSS feed
 │   │   └── og/
@@ -98,23 +273,21 @@ personal-blog/                          ← Next.js repo
 │   │
 │   ├── components/
 │   │   ├── layout/
-│   │   │   ├── SidebarLeft.tsx         ← Navigation sidebar
-│   │   │   ├── SidebarRight.tsx        ← TOC + Related posts wrapper
+│   │   │   ├── SidebarLeft.tsx         ← 5-tier navigation sidebar
+│   │   │   ├── SidebarRight.tsx        ← Newsletter + quotes wrapper
 │   │   │   ├── MobileHeader.tsx        ← Mobile hamburger header
 │   │   │   └── Footer.tsx
 │   │   ├── content/
 │   │   │   ├── ArticleCard.tsx         ← Horizontal article card
 │   │   │   ├── NoteCard.tsx            ← Short note card (tweet-style)
 │   │   │   ├── ActivityFeed.tsx        ← Mixed timeline
-│   │   │   ├── SeriesNav.tsx           ← ← Prev | Part 3/5 | Next →
-│   │   │   ├── SeriesCard.tsx          ← Series overview card
+│   │   │   ├── SeriesNav.tsx           ← Series navigation
 │   │   │   └── RelatedPosts.tsx        ← Related posts section
 │   │   ├── article/
 │   │   │   ├── TableOfContents.tsx     ← Sticky TOC with active tracking
 │   │   │   ├── CopyHeadingLink.tsx     ← Click heading → copy anchor
 │   │   │   ├── CodeBlock.tsx           ← Syntax highlight + copy + filename
 │   │   │   ├── MermaidDiagram.tsx      ← Client-side mermaid render
-│   │   │   ├── HtmlVisualization.tsx   ← Raw HTML embed (sandboxed)
 │   │   │   └── SocialShare.tsx         ← Share buttons
 │   │   ├── terms/
 │   │   │   ├── TermHighlighter.tsx     ← Wrap matched terms in post body
@@ -122,15 +295,18 @@ personal-blog/                          ← Next.js repo
 │   │   ├── ui/
 │   │   │   ├── ThemeToggle.tsx         ← Light/Dark mode switch
 │   │   │   ├── BackToTop.tsx           ← Scroll to top button
-│   │   │   ├── Breadcrumb.tsx          ← Category > Series > Post
+│   │   │   ├── Breadcrumb.tsx          ← Folder > Post
 │   │   │   ├── TagBadge.tsx            ← Tag pill
 │   │   │   └── ReadingTime.tsx         ← "X phút đọc"
 │   │   └── seo/
 │   │       └── JsonLd.tsx              ← Structured data
 │   │
 │   └── lib/
-│       ├── content.ts                  ← Content query helpers
+│       ├── profile.ts                  ← 🔑 Read & parse profile.mdx
+│       ├── content.ts                  ← Content query helpers (IT/ only)
 │       ├── terms.ts                    ← Term matching logic
+│       ├── views.ts                    ← Parse Tolaria views/*.yml
+│       ├── folders.ts                  ← Scan IT/ folder structure
 │       ├── reading-time.ts             ← Word count → minutes
 │       ├── toc.ts                      ← Extract headings
 │       └── related.ts                  ← Related posts algorithm
@@ -144,6 +320,47 @@ personal-blog/                          ← Next.js repo
 
 ---
 
+## Design System — Bám sát phiên bản gốc
+
+### Color Palette (từ analysis hunghuc.work)
+
+| Mục đích | Light | Dark |
+|---|---|---|
+| Background | `#ffffff` | `#09090b` |
+| Background secondary | `#fafafa` | `#18181b` |
+| Hover background | `#f4f4f5` | `#27272a` |
+| Text primary | `#18181b` | `#fafafa` |
+| Text secondary | `#71717a` | `#a1a1aa` |
+| Text muted/meta | `#a1a1aa` | `#71717a` |
+| Border/Divider | `#f4f4f5` | `#27272a` |
+| Accent (links) | `#2563eb` | `#3b82f6` |
+
+> [!NOTE]
+> Palette **monochrome zinc** giống bản gốc. Không gradient, không màu sặc sỡ. Border dùng zinc rất nhạt (`#f4f4f5`) thay vì box-shadow nặng.
+
+### Layout dimensions (từ screenshot)
+
+| Element | Size |
+|---|---|
+| Sidebar left width | `260px` |
+| Sidebar right width | `280px` |
+| Content max-width | Fluid (space between sidebars) |
+| Thumbnail desktop | `144×96px` |
+| Thumbnail mobile | `96×64px` |
+| Avatar hero | `96×96px` |
+| Avatar feed | `32×32px` |
+| Border radius cards | `12-16px` |
+| Border radius avatar | `50%` (circle) |
+
+### Micro-animations (từ analysis)
+
+- Hover transitions: `transition: all 0.2s`
+- Restack card scale: `transform: scale(1.008)`
+- Card hover: background change + subtle lift
+- No heavy shadows — mainly `border-bottom` dividers
+
+---
+
 ## Phase 1: Project Setup
 
 ### Mục tiêu
@@ -151,49 +368,50 @@ Next.js 16 + Tailwind CSS v4 + Git submodule + Velite chạy được.
 
 ---
 
-#### [NEW] `package.json`
-Khởi tạo Next.js 16 project:
-```bash
-npx -y create-next-app@latest ./ --typescript --tailwind --app --src-dir --turbopack --no-eslint
-```
+#### [EXISTING] `package.json`
 Cài thêm dependencies:
 - `velite` — content parsing
 - `shiki` — syntax highlighting
 - `rehype-shiki`, `remark-gfm`, `remark-math` — markdown plugins
 - `lucide-react` — icons
 - `mermaid` — diagrams
-- `isomorphic-dompurify` — HTML sanitization
+- `gray-matter` — parse profile.mdx frontmatter
+- `js-yaml` — parse Tolaria view files
+- `glob` — scan folder structure
 
-#### [NEW] `.gitmodules`
-```
-[submodule "content"]
-    path = content
-    url = git@github.com:<user>/second-brain.git
-    branch = main
-```
+#### [VERIFY] `.gitmodules`
+Submodule đã config, verify path `content/` trỏ đúng vault repo.
 
 #### [NEW] `velite.config.ts`
-Velite schema definitions cho 3 content types:
+Velite schema cho content **chỉ từ `content/IT/`**:
 
-**Post schema:**
+**Post schema** (từ `content/IT/*/` — exclude `terms/` và `notes/`):
 ```typescript
 {
-  slug, title, description, tags, category,
+  slug, title, description, tags, folder,    // folder = tên thư mục cha
   series, series_order, published, featured,
   cover_image, created, updated,
-  body, raw, toc, readingTime
+  body, raw, toc, readingTime,
+  type                                       // Tolaria type field
 }
 ```
 
-**Note schema:**
+**Note schema** (từ `content/IT/notes/`):
 ```typescript
 { slug, created, published, tags, body }
 ```
 
-**Term schema:**
+**Term schema** (từ `content/IT/terms/`):
 ```typescript
 { slug, title, aliases, definition, tags, related, body }
 ```
+
+> [!IMPORTANT]
+> Velite pattern paths:
+> - Posts: `content/IT/!(terms|notes)/**/*.md`
+> - Notes: `content/IT/notes/**/*.md`
+> - Terms: `content/IT/terms/**/*.md`
+> - **Exclude**: `content/*.md`, `content/views/`, `content/AGENTS.md`
 
 #### [NEW] `next.config.ts`
 - Velite plugin integration
@@ -201,42 +419,67 @@ Velite schema definitions cho 3 content types:
 - Turbopack (default in Next.js 16)
 - Image optimization config
 
-#### [NEW] `tsconfig.json`
-Path aliases: `@/*` → `./src/*`
-
 ---
 
-## Phase 2: Design System & Layout
+## Phase 2: Profile System & Design
 
 ### Mục tiêu
-Tailwind v4 theme + component classes + 3-column layout + dark mode.
+Profile reader + Tailwind v4 theme + 3-column layout + dark mode — bám sát design gốc.
 
 ---
 
-#### [NEW] `src/app/globals.css`
+#### [NEW] `src/lib/profile.ts`
+```typescript
+// Đọc và parse content/profile.mdx tại build time
+getProfile(): {
+  blog_name, blog_tagline,
+  author_name, author_display_name, avatar,
+  social: { platform, url }[],
+  email,
+  sidebar_work: { label, icon, href }[],
+  newsletter: { enabled, provider, form_id, heading, description, cta, note },
+  seo: { title, description, og_image },
+  aboutContent: string  // MDX body
+}
+```
 
-Tailwind v4 CSS-native config:
+> [!NOTE]
+> Hàm này dùng `gray-matter` để parse frontmatter + body. Kết quả được cache tại build time. Source code KHÔNG chứa bất kỳ thông tin cá nhân nào.
+
+#### [NEW] `src/lib/views.ts`
+```typescript
+// Đọc content/views/*.yml → parse sang sidebar nav items
+getViews(): { name, icon, color, slug, count }[]
+```
+
+#### [NEW] `src/lib/folders.ts`
+```typescript
+// Scan content/IT/* top-level folders
+// Exclude: terms/, notes/, views/
+getFolders(): { name, slug, count }[]
+```
+
+#### [NEW] `src/app/globals.css`
+Tailwind v4 CSS-native config — **zinc monochrome palette bám sát bản gốc**:
 
 ```css
 @import "tailwindcss";
 
-/* ===== Design System Theme ===== */
 @theme {
-  /* Colors — Zinc-based palette */
+  /* Monochrome Zinc — EXACT match hunghuc.work */
   --color-bg-primary: #ffffff;
   --color-bg-secondary: #fafafa;
   --color-bg-hover: #f4f4f5;
   --color-text-primary: #18181b;
-  --color-text-secondary: #52525b;
+  --color-text-secondary: #71717a;
   --color-text-muted: #a1a1aa;
-  --color-border: #e4e4e7;
+  --color-border: #f4f4f5;        /* Very light — divider style */
   --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
 
   /* Typography */
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
-  /* Spacing */
+  /* Layout */
   --spacing-sidebar: 260px;
   --spacing-sidebar-right: 280px;
 
@@ -247,7 +490,6 @@ Tailwind v4 CSS-native config:
   --radius-full: 9999px;
 }
 
-/* ===== Dark Mode Override ===== */
 [data-theme="dark"] {
   --color-bg-primary: #09090b;
   --color-bg-secondary: #18181b;
@@ -257,169 +499,106 @@ Tailwind v4 CSS-native config:
   --color-text-muted: #71717a;
   --color-border: #27272a;
   --color-accent: #3b82f6;
-  --color-accent-hover: #60a5fa;
 }
-
-/* ===== Component classes ===== */
-
-/* Layout */
-.layout-main { /* 3-column grid */ }
-.sidebar-left { /* fixed left nav */ }
-.sidebar-right { /* sticky right panel */ }
-.content-area { /* center content */ }
-
-/* Cards */
-.card-article { /* horizontal article card */ }
-.card-note { /* tweet-style note card */ }
-.card-series { /* series overview card */ }
-
-/* Article prose */
-.prose-article { /* article body typography */ }
-.prose-article h2 { /* ... */ }
-.prose-article pre { /* code block wrapper */ }
-.prose-article code { /* inline code */ }
-
-/* Code blocks */
-.code-block { /* shiki code container */ }
-.code-block-header { /* filename tab */ }
-.code-block-copy { /* copy button */ }
-
-/* TOC */
-.toc-container { /* sticky toc wrapper */ }
-.toc-item { /* toc entry */ }
-.toc-item-active { /* active heading */ }
-
-/* Term popup */
-.term-highlight { /* underline style in prose */ }
-.term-popup { /* floating dialog */ }
 ```
-
-> [!NOTE]
-> Tailwind v4 cho phép dùng cả utility classes (`flex`, `gap-4`, `text-sm`...) VÀ custom component classes (`.card-article`, `.prose-article`...) trong cùng một hệ thống. Component classes dùng `@apply` hoặc viết CSS thuần với theme tokens.
 
 #### [NEW] `src/app/layout.tsx`
 - Root layout: `<html lang="vi" data-theme="light">`
 - `next/font` cho Inter (variable, no layout shift)
-- 3-column Tailwind grid layout
-- `<SidebarLeft>` + `<main>` + slot cho `<SidebarRight>`
+- 3-column Tailwind grid layout (match screenshot exactly)
+- Profile data injected via `getProfile()`
+- `<SidebarLeft>` + `<main>` + `<SidebarRight>`
 
 #### [NEW] `src/components/layout/SidebarLeft.tsx`
-- Logo/avatar + blog name
-- Nav sections: Home, Articles, Notes, Series, Terms (Dictionary)
-- WORK section: About
-- Tags section (bottom, auto-generated from all posts)
-- Badge count per nav item
-- Mobile: slide-in drawer with backdrop
+**5-tier sidebar** — data-driven, no hardcoded personal info:
+
+1. **Header**: Avatar + display name (từ `profile.mdx`)
+2. **Home**: Fixed nav item
+3. **Views**: Auto-loaded từ `views/*.yml` (name + badge count)
+4. **Folders**: Auto-detected từ `IT/` subfolders (name + badge count)
+5. **Work**: Items từ `profile.mdx` `sidebar_work` array
+6. **Tags**: Auto-generated từ all post tags
+
+Mobile: slide-in drawer with backdrop.
 
 #### [NEW] `src/components/layout/SidebarRight.tsx`
-- Context-aware wrapper (React Server Component)
-- Article page → render `<TableOfContents>` + `<RelatedPosts>`
-- Other pages → render featured posts hoặc hidden
+- Newsletter box (config từ `profile.mdx`)
+- Quote highlights (random trích dẫn từ posts)
+- Footer: `© {year} {blog_name}` (từ profile)
+- Context-aware: Article page → TOC + Related thay thế newsletter
 
 #### [NEW] `src/components/layout/MobileHeader.tsx`
-- Sticky top bar: avatar + blog name + hamburger toggle
-- Tailwind responsive: `lg:hidden`
+- Sticky top bar: avatar + display name + hamburger
+- All data từ `profile.mdx`
 
 #### [NEW] `src/components/layout/Footer.tsx`
-- Copyright + "Built with Next.js & Tolaria"
+- `© {year} {profile.blog_name}. Build with Next.js`
 
 #### [NEW] `src/components/ui/ThemeToggle.tsx`
-- Client component (`'use client'`)
-- Sun ↔ Moon icon animation
-- `localStorage` persistence
-- Respects `prefers-color-scheme` on first load
-- Sets `data-theme` on `<html>` element
+- Sun ↔ Moon icon, `localStorage` persistence
+- Respects `prefers-color-scheme`
 
 ---
 
 ## Phase 3: Core Pages
 
 ### Mục tiêu
-Tất cả routes chính render content từ Velite.
+Tất cả routes chính render content từ Velite — chỉ từ `IT/` folder.
 
 ---
 
 #### [NEW] `src/lib/content.ts`
 ```typescript
-getAllPosts()           // sorted by date, published only
+// CHỈ query content từ content/IT/ — filtered by Velite patterns
+getAllPosts()               // posts từ IT/!(terms|notes), sorted by date
 getPostBySlug(slug)
-getAllNotes()
-getPostsByCategory(category)
+getAllNotes()               // từ IT/notes/
+getPostsByFolder(folder)   // posts trong 1 folder cụ thể
 getPostsByTag(tag)
 getPostsBySeries(series)
-getAllSeries()          // unique series + metadata + post count
-getAllCategories()      // unique categories + counts
-getAllTags()            // unique tags + counts
-getFeaturedPosts()     // featured: true
+getAllSeries()
+getAllTags()
+getFeaturedPosts()
 ```
 
 #### [NEW] `src/app/page.tsx` — Homepage
-- Hero section: avatar, blog name, bio, social links (X, GitHub, LinkedIn)
-- **Tab navigation**: Activity | Articles | Notes (client-side tab switch)
-- Activity tab: mixed timeline (notes + articles interleaved by date)
+- Hero section: avatar, blog name, bio, social links ← **all from `profile.mdx`**
+- Tab navigation: Activity | Articles | Notes
+- Activity tab: mixed timeline (notes + articles)
 - Articles tab: horizontal article cards
 - Notes tab: note cards only
 
-#### [NEW] `src/components/content/ArticleCard.tsx`
-- Horizontal layout: thumbnail (left) + content (right)
-- Title (font-bold), description (line-clamp-2, hidden on mobile), meta (date · reading time)
-- Series badge if applicable: "Part 3 · System Design"
-- Premium lock icon (nếu có)
-- Hover: background change + subtle scale
-
-#### [NEW] `src/components/content/NoteCard.tsx`
-- Twitter/Threads style: avatar (32px) + author + relative time
-- Text content (multi-paragraph)
-- Optional: restack card (embedded article link with cover image + gradient overlay)
-
-#### [NEW] `src/components/content/ActivityFeed.tsx`
-- Merges notes + articles by date
-- Renders appropriate card type per item
-
 #### [NEW] `src/app/articles/page.tsx`
-- All published articles, newest first
-- Optional category filter tabs
+- All published articles (từ `IT/` folders)
 
 #### [NEW] `src/app/p/[slug]/page.tsx` — Article Detail ⭐
-
-Đây là trang phức tạp nhất:
-- `generateStaticParams()` → pre-render all post slugs
-- `generateMetadata()` → dynamic title, description, OG image
-- **Breadcrumb**: Home > Category > [Series >] Post title
-- **Meta bar**: date, last updated, reading time, tags
-- **Series nav** (if in series): ← Prev | "Part 3 of 5" | Next →
-- **Article body**: rendered HTML with:
-  - Shiki code blocks (copy button, filename tab, line highlight)
-  - Mermaid diagrams (auto-detected from ```mermaid blocks)
-  - HTML visualizations (from `<!-- viz:xxx -->` markers)
-  - **Term highlights** (auto-matched terms with popup on click)
-  - Copy anchor link on headings (h2-h4)
-- **Social share** buttons (bottom)
-- **Related posts** (bottom, below article)
-
-Right sidebar on this page:
-- **Table of Contents** (sticky, active tracking)
-- **Related Posts** (below TOC)
+- Breadcrumb: Home > Folder > Post title
+- Meta bar: date, last updated, reading time, tags
+- Series nav (if applicable)
+- Article body: Shiki code blocks, Mermaid, Term highlights
+- Right sidebar: TOC + Related posts
 
 #### [NEW] `src/app/notes/page.tsx`
-- All notes, newest first
+- All notes (từ `IT/notes/`)
 
-#### [NEW] `src/app/series/page.tsx`
-- Grid of series cards
-- Each card: series name, post count, last updated, short description
+#### [NEW] `src/app/folder/[slug]/page.tsx`
+- Posts filtered by folder (e.g., `/folder/architectures`)
 
-#### [NEW] `src/app/series/[slug]/page.tsx`
-- Series landing: ordered list of posts
-- Visual progress (numbered, with links)
-
-#### [NEW] `src/app/category/[slug]/page.tsx`
-- Posts filtered by category
+#### [NEW] `src/app/view/[slug]/page.tsx`
+- Posts filtered by Tolaria view (e.g., `/view/luyen-thuyen`)
+- Uses view filter logic to match posts
 
 #### [NEW] `src/app/tag/[slug]/page.tsx`
 - Posts filtered by tag
 
 #### [NEW] `src/app/about/page.tsx`
-- About the author, intro, contact
+- **Renders `profile.mdx` body content** as About page
+- No hardcoded About text in source
+
+#### Content components
+- [NEW] `src/components/content/ArticleCard.tsx` — Horizontal card (match screenshot)
+- [NEW] `src/components/content/NoteCard.tsx` — Tweet-style card
+- [NEW] `src/components/content/ActivityFeed.tsx` — Mixed timeline
 
 ---
 
@@ -430,225 +609,69 @@ TOC, code blocks, mermaid, related posts, series nav.
 
 ---
 
-#### [NEW] `src/lib/toc.ts`
-- Parse rendered HTML → extract h2, h3, h4
-- Return `{ id, text, level, children }[]` nested tree
-
-#### [NEW] `src/components/article/TableOfContents.tsx`
-- Client component
-- Render heading tree as nested list
-- `IntersectionObserver` → highlight active heading
-- Tailwind: `sticky top-24` positioning
-- Smooth scroll on click
-- Responsive: floating drawer on mobile (`lg:block hidden`)
-
-#### [NEW] `src/lib/related.ts`
-Algorithm (no database needed):
-```
-Score each post:
-  +10  same series (adjacent parts)
-  +5   same category
-  +2   per overlapping tag
-  +3   wikilink relationship
-Sort by score desc → return top 4
-```
-
-#### [NEW] `src/components/content/RelatedPosts.tsx`
-- Grid of 2-4 related post cards (compact variant)
-
-#### [NEW] `src/components/article/CodeBlock.tsx`
-- Shiki syntax highlighting (build-time via rehype-shiki plugin)
-- File name tab header (if specified)
-- Copy to clipboard button (top-right)
-- Line numbers (optional)
-- Line highlighting (`// [!code highlight]`)
-- Diff support (`// [!code ++]` / `// [!code --]`)
-
-#### [NEW] `src/components/article/MermaidDiagram.tsx`
-- Client component, `next/dynamic` with `ssr: false`
-- Detect ```mermaid code blocks → render SVG
-- Theme-aware (light/dark mermaid theme)
-
-#### [NEW] `src/components/article/HtmlVisualization.tsx`
-- Parse `<!-- viz:xxx -->` markers in markdown
-- Load HTML from `/content/visualizations/xxx.html`
-- Render via `dangerouslySetInnerHTML` + DOMPurify
-- Wrapped in styled container with border
-
-#### [NEW] `src/components/article/CopyHeadingLink.tsx`
-- Rehype plugin adds anchor `id` to h2-h4
-- On hover: show link icon
-- On click: copy `window.location.origin + path + #id` → toast "Đã copy!"
-
-#### [NEW] `src/components/article/SocialShare.tsx`
-- Buttons: X (Twitter), Facebook, LinkedIn
-- Pre-populated share intent URLs
-
-#### [NEW] `src/components/content/SeriesNav.tsx`
-- Sticky or inline series navigation
-- "← Bài trước | Phần 3/5 | Bài tiếp →"
-- Small progress bar visual
-- Link to series landing page
+- [NEW] `src/lib/toc.ts` — Extract h2-h4 headings
+- [NEW] `src/components/article/TableOfContents.tsx` — Sticky, active tracking
+- [NEW] `src/lib/related.ts` — Scoring algorithm (series +10, folder +5, tag +2)
+- [NEW] `src/components/content/RelatedPosts.tsx` — Grid of 2-4 cards
+- [NEW] `src/components/article/CodeBlock.tsx` — Shiki + copy + filename
+- [NEW] `src/components/article/MermaidDiagram.tsx` — Client-side render
+- [NEW] `src/components/article/CopyHeadingLink.tsx` — Click → copy anchor
+- [NEW] `src/components/article/SocialShare.tsx` — X, Facebook, LinkedIn
+- [NEW] `src/components/content/SeriesNav.tsx` — ← Prev | Part 3/5 | Next →
 
 ---
 
 ## Phase 5: Term Dictionary (Popup/Dialog)
 
 ### Mục tiêu
-Auto-match thuật ngữ IT trong bài viết, hiển thị popup/dialog khi click — **không gián đoạn reading flow**.
+Auto-match thuật ngữ IT trong bài viết. **Terms nằm trong submodule** tại `content/IT/terms/`.
 
 ---
 
-### UX Flow
+### UX Flow (giữ nguyên v2)
 
 ```
-Người đọc đang đọc bài viết
-    ↓
-Gặp từ "API Gateway" (có đường gạch chấm dưới, nhẹ nhàng)
-    ↓
-Click hoặc hover
-    ↓
-Floating popup xuất hiện NGAY TẠI VỊ TRÍ con trỏ
-    ↓
+Đọc bài → gặp "API Gateway" (dotted underline) → click → floating popup
 ┌─────────────────────────────────┐
 │  📘 API Gateway                 │
-│                                 │
 │  Một reverse proxy đứng trước   │
-│  backend services, xử lý        │
-│  routing, auth, rate limiting.   │
-│                                 │
+│  backend services...            │
 │  Tags: #architecture #micro...  │
-│                                 │
-│  [Xem chi tiết →]              │
-│  [Đóng ✕]                      │
+│  [Xem chi tiết →]  [Đóng ✕]   │
 └─────────────────────────────────┘
-    ↓
-Click ngoài popup hoặc nhấn ESC → popup biến mất
-Người đọc tiếp tục đọc bài (scroll position không đổi)
+Click ngoài / ESC → dismiss, scroll position không đổi
 ```
 
-> [!IMPORTANT]
-> **Nguyên tắc**: Popup **floating** (Popover API hoặc absolute positioning), **KHÔNG phải modal full-screen**. Người đọc không bị redirect, không bị mất vị trí đọc. "Xem chi tiết →" mở sang tab mới nếu cần đọc sâu hơn.
-
----
-
-#### [NEW] Term content schema (trong `velite.config.ts`)
-
-```yaml
-# /content/terms/api-gateway.md
----
-type: Term
-title: API Gateway
-aliases:
-  - "api gateway"
-  - "API GW"
-definition: "Một reverse proxy đứng trước backend services, xử lý routing, auth, rate limiting."
-tags:
-  - architecture
-  - microservices
-related:
-  - "[[microservices]]"
-  - "[[load-balancer]]"
----
-
-# API Gateway
-
-(Nội dung chi tiết cho trang dictionary — optional)
-```
-
-#### [NEW] `src/lib/terms.ts`
-Build-time processing:
-1. Load all term entries (title + aliases + definition)
-2. Build sorted list of patterns (longest first, case-insensitive)
-3. `matchTermsInHtml(html, terms)`:
-   - Regex match term titles + aliases trong text nodes
-   - **Skip**: code blocks (`<pre>`, `<code>`), headings (`<h1>`-`<h6>`), existing links (`<a>`), existing term spans
-   - Wrap matched text: `<span class="term-highlight" data-term-slug="api-gateway" data-term-title="API Gateway" data-term-def="...">`
-   - Only match **first occurrence** per term per article (avoid noise)
-
-#### [NEW] `src/components/terms/TermHighlighter.tsx`
-- Server component wrapper
-- Receives post HTML + all terms
-- Calls `matchTermsInHtml()` → outputs modified HTML
-- Styling: subtle dotted underline (`border-bottom: 1px dotted var(--color-accent)`)
-
-#### [NEW] `src/components/terms/TermPopup.tsx`
-- Client component (`'use client'`)
-- Global event listener trên `[data-term-slug]` elements
-- **On click**: show floating popup anchored to clicked element
-  - Sử dụng CSS `anchor()` positioning (modern) hoặc JS positioning fallback
-  - Content: term title, definition, tags, "Xem chi tiết →" link (opens new tab)
-- **On click outside / ESC / scroll away**: dismiss popup
-- **Animation**: fade-in + slight scale (`opacity 0→1, scale 0.95→1`)
-- **Mobile**: popup hiện ở bottom (như bottom sheet nhỏ) để dễ đọc
-
-#### [NEW] `src/app/terms/page.tsx` (Optional browse page)
-- Alphabetical list of all terms, grouped by letter
-- Client-side filter input
-- Click term → expand inline definition (accordion)
-- Dùng cho người muốn "browse dictionary" chứ không bắt buộc navigate đến
+- [NEW] `src/lib/terms.ts` — Match terms, skip code blocks/headings/links
+- [NEW] `src/components/terms/TermHighlighter.tsx` — Server component wrapper
+- [NEW] `src/components/terms/TermPopup.tsx` — Client floating popup
+- [NEW] `src/app/terms/page.tsx` — Dictionary browse page (optional)
 
 ---
 
 ## Phase 6: SEO & Extras
 
-### Mục tiêu
-OG images, RSS, structured data, breadcrumbs.
-
----
-
-#### [NEW] `src/app/og/route.tsx`
-- `@vercel/og` (Satori) OG image generation
-- Template: dark background + blog logo + post title + category badge
-- URL: `/og?title=...&category=...`
-- Referenced in `generateMetadata()` of each post
-
-#### [NEW] `src/app/rss.xml/route.ts`
-- RSS 2.0 feed from all published posts
-- title, description, pubDate, link, content snippet
-
-#### [NEW] `src/components/seo/JsonLd.tsx`
-- Reusable JSON-LD component
-- Types: Person, WebSite, BlogPosting, BreadcrumbList, Article
-
-#### [NEW] `src/components/ui/Breadcrumb.tsx`
-- Home > Category > [Series] > Post title
-- Schema.org BreadcrumbList markup
-- Tailwind: muted text, hover accent
-
-#### [NEW] `src/components/ui/BackToTop.tsx`
-- Floating button, appears after `scrollY > 300`
-- Smooth scroll to top
-- Tailwind: `fixed bottom-6 right-6`, fade animation
-
-#### [NEW] `src/components/ui/ReadingTime.tsx`
-- "X phút đọc" badge
+- [NEW] `src/app/og/route.tsx` — OG Image generation (title, folder từ post, blog name từ profile)
+- [NEW] `src/app/rss.xml/route.ts` — RSS feed (blog metadata từ `profile.mdx`)
+- [NEW] `src/components/seo/JsonLd.tsx` — Structured data (author info từ profile)
+- [NEW] `src/components/ui/Breadcrumb.tsx` — Home > Folder > Post
+- [NEW] `src/components/ui/BackToTop.tsx` — Scroll to top
+- [NEW] `src/components/ui/ReadingTime.tsx` — "X phút đọc"
 
 ---
 
 ## Phase 7: Polish & Deploy
 
-### Mục tiêu
-Responsive, performance, deployment.
-
----
-
 ### Tasks
-
-- [ ] Responsive testing: mobile (`< 768px`), tablet (`768-1024`), desktop (`> 1024`)
-- [ ] Lighthouse audit: target 95+ on Performance, Accessibility, SEO
-- [ ] Image optimization: `next/image`, WebP, lazy loading, priority for above-fold
-- [ ] Font: `next/font` Inter variable (no layout shift, no FOUT)
-- [ ] Turbopack: verify dev + build work correctly
-- [ ] Vercel deployment:
-  - Enable Git submodules in Settings > Git
-  - Configure build command
-  - Custom domain (nếu có)
-- [ ] Test Git workflow:
-  - Write content in Tolaria → commit → push vault repo
-  - Verify Vercel auto-rebuilds
-- [ ] Dark mode: verify all pages/components render correctly in both modes
-- [ ] Mobile hamburger menu: slide animation, backdrop, body scroll lock
+- [ ] Responsive testing: mobile, tablet, desktop
+- [ ] Lighthouse audit: target 95+
+- [ ] Image optimization: `next/image`, WebP, lazy loading
+- [ ] Font: `next/font` Inter variable
+- [ ] Dark mode: verify all pages
+- [ ] Mobile hamburger menu
+- [ ] Vercel deployment (enable Git submodules)
+- [ ] Test: push content in vault → auto rebuild
+- [ ] **Verify template reusability**: fork repo, replace submodule, change profile.mdx → site works
 
 ---
 
@@ -656,35 +679,24 @@ Responsive, performance, deployment.
 
 ### Automated
 ```bash
-# Build check (Turbopack)
-npm run build
-
-# Type check
-npx tsc --noEmit
-
-# Lint
-npm run lint
+npm run build     # Turbopack build
+npx tsc --noEmit  # Type check
+npm run lint      # Lint
 ```
 
+### Template Verification
+- [ ] Clone fresh repo → add submodule with different profile.mdx → blog renders correctly
+- [ ] No hardcoded personal info in source (grep for names/emails/URLs)
+- [ ] Sidebar reflects profile.mdx + views + folders correctly
+
 ### Manual Checklist
-- [ ] Homepage: Activity, Articles, Notes tabs switch correctly
-- [ ] Article detail: TOC tracks active heading on scroll
-- [ ] Article detail: code blocks have copy button, syntax highlighting works
-- [ ] Article detail: mermaid diagrams render correctly
-- [ ] Article detail: HTML visualizations render safely
-- [ ] Article detail: **term popup** shows on click, dismisses on outside click/ESC
-- [ ] Article detail: term popup doesn't interrupt scroll position
-- [ ] Series navigation: prev/next links work, series landing shows all parts
-- [ ] Dark mode: toggle persists across refreshes, respects system preference
-- [ ] RSS feed validates (W3C Feed Validator)
-- [ ] OG images generate correctly (preview on X/Facebook/LinkedIn)
-- [ ] Mobile: hamburger menu works, layout is single-column
-- [ ] Mobile: TOC is accessible via floating button/drawer
-- [ ] Mobile: term popup shows as bottom sheet
-- [ ] Git submodule: content push → Vercel auto rebuild
-- [ ] Breadcrumbs show correct hierarchy on all pages
-- [ ] Social sharing links generate correct share URLs
-- [ ] Related posts show relevant suggestions
-- [ ] Back to top button appears and works
-- [ ] Reading time displays correctly
-- [ ] Copy heading link works (click → copy URL with anchor)
+- [ ] Homepage: Hero shows profile data, tabs work
+- [ ] Sidebar: 5-tier hierarchy renders correctly (Home → Views → Folders → Work → Tags)
+- [ ] Article detail: TOC, code blocks, mermaid, term popup
+- [ ] About page: renders profile.mdx body content
+- [ ] Dark mode: toggle works, persists
+- [ ] RSS/OG: blog metadata from profile
+- [ ] Submodule: only IT/ folder content renders
+- [ ] Submodule: root files (architecture.md, note.md, etc.) NOT rendered
+- [ ] Terms: popup shows on click, doesn't interrupt scroll
+- [ ] Mobile: responsive, hamburger menu
