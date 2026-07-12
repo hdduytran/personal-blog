@@ -1,5 +1,13 @@
 # Personal IT Blog Template
 
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![GitHub](https://img.shields.io/badge/GitHub-hdduytran%2Fpersonal--blog-181717?logo=github&logoColor=white)](https://github.com/hdduytran/personal-blog)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/hdduytran/personal-blog)
+
+> Source repository: [github.com/hdduytran/personal-blog](https://github.com/hdduytran/personal-blog)
+
 A content-driven personal IT blog built with **Next.js 16** (App Router, Turbopack), **Tailwind CSS v4**, and a Markdown/MDX content layer. All site identity lives in a `profile.mdx` file — no personal data is hardcoded in the source.
 
 ## Concept
