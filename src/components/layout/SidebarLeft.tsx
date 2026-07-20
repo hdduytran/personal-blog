@@ -32,7 +32,7 @@ function NavRow({
     <ActiveLink
       href={href}
       exact={exact}
-      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors"
+      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-colors"
     >
       <Icon name={icon} size={18} className="shrink-0 text-ink-soft" />
       <span className="flex-1 truncate">{label}</span>
