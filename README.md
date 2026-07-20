@@ -8,14 +8,14 @@
 
 > Source repository: [github.com/hdduytran/personal-blog](https://github.com/hdduytran/personal-blog)
 
-A content-driven personal IT blog built with **Next.js 16** (App Router, Turbopack), **Tailwind CSS v4**, and a Markdown/MDX content layer. All site identity lives in a `profile.mdx` file — no personal data is hardcoded in the source.
+A content-driven personal IT blog built with **Next.js 16** (App Router, Turbopack), **Tailwind CSS v4**, and a Markdown/MDX content layer. All site identity lives in a `profile.md` file — no personal data is hardcoded in the source.
 
 ## Concept
 
 - **Content-first.** Posts, notes, glossary terms, and curated "views" are plain Markdown files under `content/`. The app reads them at build time.
-- **Zero hardcoded identity.** Blog name, author, bio, and social links all come from `content/profile.mdx`. Rebrand by editing one file.
+- **Zero hardcoded identity.** Blog name, author, bio, and social links all come from `content/profile.md`. Rebrand by editing one file.
 - **Rich article experience.** Table of contents, social share, related posts, series navigation, term-dictionary popups, `[[wikilinks]]`, Mermaid diagrams, dark mode, RSS feed, and dynamically generated OG images.
-- **Tolaria-style content layout.** Content is organized as `IT/Architectures`, `IT/Notes`, `IT/Terms`, plus `profile.mdx` and `views/*.yml` (curated filters).
+- **Tolaria-style content layout.** Content is organized as `IT/Architectures`, `IT/Notes`, `IT/Terms`, plus `profile.md` and `views/*.yml` (curated filters).
 
 ## Tech Stack
 
@@ -31,7 +31,7 @@ A content-driven personal IT blog built with **Next.js 16** (App Router, Turbopa
 
 ```
 content/                 # your content repo (git submodule) — not included here
-  profile.mdx            # site identity (name, author, bio, socials)
+  profile.md            # site identity (name, author, bio, socials)
   IT/
     Architectures/*.md   # blog posts (frontmatter-driven)
     Notes/*.md           # short notes / TIL
@@ -72,7 +72,7 @@ git commit -m "chore: add content submodule"
 
 | File | Purpose | Key frontmatter |
 | ---- | ------- | --------------- |
-| `content/profile.mdx` | Site identity | `blog_name`, `author`, `bio`, `socials[]` |
+| `content/profile.md` | Site identity | `blog_name`, `author`, `bio`, `socials[]` |
 | `content/IT/Architectures/*.md` | Posts | `title`, `created`, `tags[]`, `series?`, `featured?`, `summary?` |
 | `content/IT/Notes/*.md` | Notes / TIL | `title`, `created`, `tags[]` |
 | `content/IT/Terms/*.md` | Glossary terms | `title`, `aliases?`, `tags[]`, `excerpt` |
@@ -108,5 +108,5 @@ You can also just drop a plain `content/` directory at the repo root. The app re
 ### Notes
 
 - **Dark mode** is controlled by a `data-theme` attribute on `<html>`, toggled in the UI and persisted in `localStorage`.
-- **Rebrand** by editing only `content/profile.mdx` — no source changes needed.
+- **Rebrand** by editing only `content/profile.md` — no source changes needed.
 - **Term popups** are triggered by clicking any highlighted term in an article; the glossary is built from `content/IT/Terms`.

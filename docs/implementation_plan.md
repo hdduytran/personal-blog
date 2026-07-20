@@ -22,7 +22,7 @@ Thiết kế bám sát phiên bản gốc hunghuc.work:
 | Mermaid | Có — render mermaid code blocks thành diagrams |
 | Design | **Clean minimalist zinc** — bám sát hunghuc.work (monochrome zinc palette, Inter font, subtle borders) |
 | Ngôn ngữ | Tiếng Việt chính, đôi khi tiếng Anh |
-| Personal Data | **KHÔNG** hardcode trong source — tất cả lấy từ `profile.mdx` trong submodule |
+| Personal Data | **KHÔNG** hardcode trong source — tất cả lấy từ `profile.md` trong submodule |
 | Template | Source code là **reusable template** — fork về, thay submodule, chạy |
 | Features bổ sung | RSS, OG Image gen, Reading time, Copy heading link, Social sharing, Back to top, Breadcrumb, Last updated, **Term Dictionary (popup/dialog)** |
 
@@ -49,17 +49,17 @@ Thiết kế bám sát phiên bản gốc hunghuc.work:
 ## User Review Required
 
 > [!IMPORTANT]
-> **Source code = Template**: Source code blog sẽ **không chứa bất kỳ thông tin cá nhân nào**. Tên blog, avatar, bio, social links, contact info... tất cả được lấy từ file `profile.mdx` trong git submodule. Khi fork template, chỉ cần thay submodule content.
+> **Source code = Template**: Source code blog sẽ **không chứa bất kỳ thông tin cá nhân nào**. Tên blog, avatar, bio, social links, contact info... tất cả được lấy từ file `profile.md` trong git submodule. Khi fork template, chỉ cần thay submodule content.
 
 > [!IMPORTANT]
 > **Submodule rendering rules**:
 > - Chỉ render thư mục nằm trong folder `IT/` (Tolaria vault structure)
-> - Chỉ render file `profile.mdx` ở root của submodule
+> - Chỉ render file `profile.md` ở root của submodule
 > - **Bỏ render** các file khác nằm ngoài folder (`architecture.md`, `note.md`, `type.md`, `AGENTS.md`) — đây là Tolaria system files
 > - Term dictionary cũng nằm trong submodule (folder `IT/terms/`)
 
 > [!WARNING]
-> **Cấu trúc submodule hiện tại** chỉ có `content/IT/Architectures/` với 3 bài. Cần tạo thêm cấu trúc folders cho terms, notes, và file `profile.mdx`.
+> **Cấu trúc submodule hiện tại** chỉ có `content/IT/Architectures/` với 3 bài. Cần tạo thêm cấu trúc folders cho terms, notes, và file `profile.md`.
 
 ---
 
@@ -67,8 +67,8 @@ Thiết kế bám sát phiên bản gốc hunghuc.work:
 
 > [!IMPORTANT]
 > 1. **Tolaria Views**: Bạn có muốn tạo Tolaria saved views (`.yml` files trong `views/` folder) để tự động classify content, hay chỉ dựa vào folder structure trong `IT/`?
-> 2. **Sidebar "Views" items**: Bạn muốn các mục Views (giống "Luyên thuyên", "AI x Ecommerce") được **tự động phát hiện** từ Tolaria `views/*.yml` files, hay **hardcode tên** từ `profile.mdx`?
-> 3. **Profile MDX content**: File `profile.mdx` cần chứa những gì ngoài: name, avatar, bio, social links, contact? Ví dụ: newsletter config, custom sidebar items?
+> 2. **Sidebar "Views" items**: Bạn muốn các mục Views (giống "Luyên thuyên", "AI x Ecommerce") được **tự động phát hiện** từ Tolaria `views/*.yml` files, hay **hardcode tên** từ `profile.md`?
+> 3. **Profile MDX content**: File `profile.md` cần chứa những gì ngoài: name, avatar, bio, social links, contact? Ví dụ: newsletter config, custom sidebar items?
 > 4. **Newsletter**: Bạn có muốn giữ newsletter subscribe (sidebar phải) như bản gốc không? Nếu có, newsletter provider nào (Kit.com, Buttondown, etc.)?
 
 ---
@@ -77,7 +77,7 @@ Thiết kế bám sát phiên bản gốc hunghuc.work:
 
 ```
 content/                              ← Git submodule → Tolaria vault repo
-├── profile.mdx                       ← 🔑 User profile (BẮT BUỘC)
+├── profile.md                       ← 🔑 User profile (BẮT BUỘC)
 │
 ├── IT/                               ← 📂 Main content root (CHỈ render folder này)
 │   ├── Architectures/                ← Folder level 1 → sidebar nav
@@ -103,7 +103,7 @@ content/                              ← Git submodule → Tolaria vault repo
 └── AGENTS.md                         ← Tolaria config (KHÔNG render)
 ```
 
-### `profile.mdx` Schema
+### `profile.md` Schema
 
 ```mdx
 ---
@@ -169,7 +169,7 @@ Có thể dùng React components, images, etc.
 ```
 
 > [!NOTE]
-> Source code blog đọc `profile.mdx` tại build time. Mọi text hiển thị (tên, bio, social links) đều đến từ file này. **Không hardcode** bất cứ thông tin cá nhân nào trong source.
+> Source code blog đọc `profile.md` tại build time. Mọi text hiển thị (tên, bio, social links) đều đến từ file này. **Không hardcode** bất cứ thông tin cá nhân nào trong source.
 
 ---
 
@@ -179,7 +179,7 @@ Sidebar trái tuân theo thứ tự **chính xác** như bản gốc, nhưng m�
 
 ```
 ┌─────────────────────────────────────────────┐
-│  🧑 [Avatar] [Display Name]                 │  ← Từ profile.mdx
+│  🧑 [Avatar] [Display Name]                 │  ← Từ profile.md
 │                                             │
 │  ─────────────────────────────────────────  │
 │                                             │
@@ -202,8 +202,8 @@ Sidebar trái tuân theo thứ tự **chính xác** như bản gốc, nhưng m�
 │                                             │
 │  ─────────────────────────────────────────  │
 │                                             │
-│  👤 WORK (từ profile.mdx sidebar_work)      │  ← Tầng 4: Writer profile/contact
-│     ❤️  About                               │     Items lấy từ profile.mdx
+│  👤 WORK (từ profile.md sidebar_work)      │  ← Tầng 4: Writer profile/contact
+│     ❤️  About                               │     Items lấy từ profile.md
 │     🌐 #WorkWithMe                          │
 │                                             │
 │  ─────────────────────────────────────────  │
@@ -220,11 +220,11 @@ Sidebar trái tuân theo thứ tự **chính xác** như bản gốc, nhưng m�
 
 | Tầng | Source | Logic |
 |---|---|---|
-| Avatar + Name | `profile.mdx` → `author_display_name`, `avatar` | Static read at build |
+| Avatar + Name | `profile.md` → `author_display_name`, `avatar` | Static read at build |
 | Home | Hardcode | Always present |
 | Views | `content/views/*.yml` | Scan `.yml` files, use `name` field, count matching notes |
 | Folders | `content/IT/*/` | Scan top-level dirs inside `IT/`, exclude `terms/`, `notes/`, count `.md` files |
-| Work | `profile.mdx` → `sidebar_work[]` | Static read at build |
+| Work | `profile.md` → `sidebar_work[]` | Static read at build |
 | Tags | All `.md` files in `IT/` | Collect unique tags from frontmatter, deduplicate |
 
 ---
@@ -234,7 +234,7 @@ Sidebar trái tuân theo thứ tự **chính xác** như bản gốc, nhưng m�
 ```
 personal-blog/                          ← Next.js repo (TEMPLATE — no personal data)
 ├── content/                            ← Git submodule → Tolaria vault repo
-│   ├── profile.mdx                     ← 🔑 User profile + About page content
+│   ├── profile.md                     ← 🔑 User profile + About page content
 │   ├── IT/                             ← Content root (chỉ render folder này)
 │   │   ├── Architectures/
 │   │   ├── AI/
@@ -265,7 +265,7 @@ personal-blog/                          ← Next.js repo (TEMPLATE — no person
 │   │   ├── terms/
 │   │   │   └── page.tsx                ← Dictionary browse page
 │   │   ├── about/
-│   │   │   └── page.tsx                ← About page (renders profile.mdx body)
+│   │   │   └── page.tsx                ← About page (renders profile.md body)
 │   │   ├── rss.xml/
 │   │   │   └── route.ts                ← RSS feed
 │   │   └── og/
@@ -302,7 +302,7 @@ personal-blog/                          ← Next.js repo (TEMPLATE — no person
 │   │       └── JsonLd.tsx              ← Structured data
 │   │
 │   └── lib/
-│       ├── profile.ts                  ← 🔑 Read & parse profile.mdx
+│       ├── profile.ts                  ← 🔑 Read & parse profile.md
 │       ├── content.ts                  ← Content query helpers (IT/ only)
 │       ├── terms.ts                    ← Term matching logic
 │       ├── views.ts                    ← Parse Tolaria views/*.yml
@@ -375,7 +375,7 @@ Cài thêm dependencies:
 - `rehype-shiki`, `remark-gfm`, `remark-math` — markdown plugins
 - `lucide-react` — icons
 - `mermaid` — diagrams
-- `gray-matter` — parse profile.mdx frontmatter
+- `gray-matter` — parse profile.md frontmatter
 - `js-yaml` — parse Tolaria view files
 - `glob` — scan folder structure
 
@@ -430,7 +430,7 @@ Profile reader + Tailwind v4 theme + 3-column layout + dark mode — bám sát d
 
 #### [NEW] `src/lib/profile.ts`
 ```typescript
-// Đọc và parse content/profile.mdx tại build time
+// Đọc và parse content/profile.md tại build time
 getProfile(): {
   blog_name, blog_tagline,
   author_name, author_display_name, avatar,
@@ -512,24 +512,24 @@ Tailwind v4 CSS-native config — **zinc monochrome palette bám sát bản gố
 #### [NEW] `src/components/layout/SidebarLeft.tsx`
 **5-tier sidebar** — data-driven, no hardcoded personal info:
 
-1. **Header**: Avatar + display name (từ `profile.mdx`)
+1. **Header**: Avatar + display name (từ `profile.md`)
 2. **Home**: Fixed nav item
 3. **Views**: Auto-loaded từ `views/*.yml` (name + badge count)
 4. **Folders**: Auto-detected từ `IT/` subfolders (name + badge count)
-5. **Work**: Items từ `profile.mdx` `sidebar_work` array
+5. **Work**: Items từ `profile.md` `sidebar_work` array
 6. **Tags**: Auto-generated từ all post tags
 
 Mobile: slide-in drawer with backdrop.
 
 #### [NEW] `src/components/layout/SidebarRight.tsx`
-- Newsletter box (config từ `profile.mdx`)
+- Newsletter box (config từ `profile.md`)
 - Quote highlights (random trích dẫn từ posts)
 - Footer: `© {year} {blog_name}` (từ profile)
 - Context-aware: Article page → TOC + Related thay thế newsletter
 
 #### [NEW] `src/components/layout/MobileHeader.tsx`
 - Sticky top bar: avatar + display name + hamburger
-- All data từ `profile.mdx`
+- All data từ `profile.md`
 
 #### [NEW] `src/components/layout/Footer.tsx`
 - `© {year} {profile.blog_name}. Build with Next.js`
@@ -562,7 +562,7 @@ getFeaturedPosts()
 ```
 
 #### [NEW] `src/app/page.tsx` — Homepage
-- Hero section: avatar, blog name, bio, social links ← **all from `profile.mdx`**
+- Hero section: avatar, blog name, bio, social links ← **all from `profile.md`**
 - Tab navigation: Activity | Articles | Notes
 - Activity tab: mixed timeline (notes + articles)
 - Articles tab: horizontal article cards
@@ -592,7 +592,7 @@ getFeaturedPosts()
 - Posts filtered by tag
 
 #### [NEW] `src/app/about/page.tsx`
-- **Renders `profile.mdx` body content** as About page
+- **Renders `profile.md` body content** as About page
 - No hardcoded About text in source
 
 #### Content components
@@ -652,7 +652,7 @@ Click ngoài / ESC → dismiss, scroll position không đổi
 ## Phase 6: SEO & Extras
 
 - [NEW] `src/app/og/route.tsx` — OG Image generation (title, folder từ post, blog name từ profile)
-- [NEW] `src/app/rss.xml/route.ts` — RSS feed (blog metadata từ `profile.mdx`)
+- [NEW] `src/app/rss.xml/route.ts` — RSS feed (blog metadata từ `profile.md`)
 - [NEW] `src/components/seo/JsonLd.tsx` — Structured data (author info từ profile)
 - [NEW] `src/components/ui/Breadcrumb.tsx` — Home > Folder > Post
 - [NEW] `src/components/ui/BackToTop.tsx` — Scroll to top
@@ -671,7 +671,7 @@ Click ngoài / ESC → dismiss, scroll position không đổi
 - [ ] Mobile hamburger menu
 - [ ] Vercel deployment (enable Git submodules)
 - [ ] Test: push content in vault → auto rebuild
-- [ ] **Verify template reusability**: fork repo, replace submodule, change profile.mdx → site works
+- [ ] **Verify template reusability**: fork repo, replace submodule, change profile.md → site works
 
 ---
 
@@ -685,15 +685,15 @@ npm run lint      # Lint
 ```
 
 ### Template Verification
-- [ ] Clone fresh repo → add submodule with different profile.mdx → blog renders correctly
+- [ ] Clone fresh repo → add submodule with different profile.md → blog renders correctly
 - [ ] No hardcoded personal info in source (grep for names/emails/URLs)
-- [ ] Sidebar reflects profile.mdx + views + folders correctly
+- [ ] Sidebar reflects profile.md + views + folders correctly
 
 ### Manual Checklist
 - [ ] Homepage: Hero shows profile data, tabs work
 - [ ] Sidebar: 5-tier hierarchy renders correctly (Home → Views → Folders → Work → Tags)
 - [ ] Article detail: TOC, code blocks, mermaid, term popup
-- [ ] About page: renders profile.mdx body content
+- [ ] About page: renders profile.md body content
 - [ ] Dark mode: toggle works, persists
 - [ ] RSS/OG: blog metadata from profile
 - [ ] Submodule: only IT/ folder content renders

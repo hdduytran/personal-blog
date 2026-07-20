@@ -30,7 +30,7 @@ export function NewsletterBox() {
       </form>
       {nl.note && <p className="mt-2 text-xs text-ink-mute">{nl.note}</p>}
       {!nl.form_id && (
-        <p className="mt-2 text-xs text-ink-mute">Set newsletter.form_id in profile.mdx.</p>
+        <p className="mt-2 text-xs text-ink-mute">Set newsletter.form_id in profile.md.</p>
       )}
     </div>
   )

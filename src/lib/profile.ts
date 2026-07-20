@@ -44,7 +44,7 @@ export interface Profile {
 }
 
 const CONTENT_DIR = path.join(process.cwd(), "content")
-const PROFILE_PATH = path.join(CONTENT_DIR, "profile.mdx")
+const PROFILE_PATH = path.join(CONTENT_DIR, "profile.md")
 
 const FALLBACK: Profile = {
   blog_name: "My Blog",
@@ -60,7 +60,7 @@ const FALLBACK: Profile = {
   ],
   newsletter: { enabled: false },
   seo: { title: "My Blog", description: "A personal blog." },
-  aboutContent: "# About\n\nThis is a template blog. Replace `profile.mdx` to make it yours.",
+  aboutContent: "# About\n\nThis is a template blog. Replace `profile.md` to make it yours.",
 }
 
 let cached: Profile | null = null
