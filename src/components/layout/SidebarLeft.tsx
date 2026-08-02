@@ -4,6 +4,7 @@ import { getFolderTree } from "@/lib/folders"
 import { getViews } from "@/lib/views"
 import { getAllTags } from "@/lib/content"
 import { FolderTree } from "@/components/layout/FolderTree"
+import { TagCloud } from "@/components/layout/TagCloud"
 import { ActiveLink } from "@/components/ui/ActiveLink"
 import { Icon } from "@/components/ui/Icon"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
@@ -103,17 +104,7 @@ export async function SidebarLeft() {
       {tags.length > 0 && (
         <>
           <SectionLabel>Tags</SectionLabel>
-          <div className="flex flex-wrap gap-2 px-3 pb-3">
-            {tags.map((t) => (
-              <Link
-                key={t}
-                href={`/tag/${encodeURIComponent(t)}`}
-                className="rounded-full border border-line px-2.5 py-1 text-xs text-ink-soft transition-colors hover:border-accent hover:text-accent"
-              >
-                #{t}
-              </Link>
-            ))}
-          </div>
+          <TagCloud tags={tags} />
         </>
       )}
 
