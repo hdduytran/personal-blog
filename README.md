@@ -10,6 +10,18 @@
 
 A content-driven personal IT blog built with **Next.js 16** (App Router, Turbopack), **Tailwind CSS v4**, and a Markdown/MDX content layer. All site identity lives in a `profile.md` file — no personal data is hardcoded in the source.
 
+## Documentation
+
+| Document | Covers |
+| -------- | ------ |
+| [Project Overview & PDR](docs/project-overview-pdr.md) | Vision, target users, core concepts, feature list, non-goals, acceptance criteria |
+| [Codebase Summary](docs/codebase-summary.md) | Structure, LOC tables, data flow, module responsibilities |
+| [Code Standards](docs/code-standards.md) | TypeScript/Next.js conventions, naming, server/client split, modularization |
+| [System Architecture](docs/system-architecture.md) | Build-time content pipeline, routing map, SSG/SSR strategy, caching |
+| [Design Guidelines](docs/design-guidelines.md) | Zinc palette, typography, component inventory, dark mode, responsive behavior |
+| [Deployment Guide](docs/deployment-guide.md) | Vercel deploy + content submodule setup |
+| [Project Roadmap](docs/project-roadmap.md) | What's done, near-term work, long-term ideas |
+
 ## Concept
 
 - **Content-first.** Posts, notes, glossary terms, and curated "views" are plain Markdown files under `content/`. The app reads them at build time.
