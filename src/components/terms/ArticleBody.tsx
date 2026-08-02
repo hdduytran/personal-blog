@@ -8,12 +8,18 @@ interface TermInfo {
   slug: string
   title: string
   excerpt: string
+  bodyHtml: string
   tags: string[]
 }
 
 export function ArticleBody({ html, terms }: { html: string; terms: TermInfo[] }) {
   const ref = useRef<HTMLDivElement>(null)
-  const [popup, setPopup] = useState<{ term: TermInfo; top: number; left: number } | null>(null)
+  const [popup, setPopup] = useState<{
+    term: TermInfo
+    top: number
+    left: number
+    isMobile: boolean
+  } | null>(null)
   const termsRef = useRef<TermInfo[]>(terms)
   termsRef.current = terms
 
@@ -27,10 +33,15 @@ export function ArticleBody({ html, terms }: { html: string; terms: TermInfo[] }
       const slug = node.dataset.termSlug || ""
       const term = termMap.get(slug)
       if (!term) return
+      const isMobile = window.matchMedia("(max-width: 639px)").matches
+      if (isMobile) {
+        setPopup({ term, top: 0, left: 0, isMobile })
+        return
+      }
       const rect = node.getBoundingClientRect()
-      const left = Math.min(rect.left, window.innerWidth - 340)
+      const left = Math.min(rect.left, window.innerWidth - 480)
       const top = rect.bottom + 8
-      setPopup({ term, top, left: Math.max(8, left) })
+      setPopup({ term, top, left: Math.max(8, left), isMobile })
     }
 
     // --- Delegated click handler (registered once) ---
@@ -113,8 +124,16 @@ export function ArticleBody({ html, terms }: { html: string; terms: TermInfo[] }
       {popup && (
         <div className="pointer-events-none fixed inset-0 z-50">
           <div
-            className="term-popup pointer-events-auto absolute w-80 rounded-xl border border-line bg-canvas p-4 shadow-lg"
-            style={{ top: popup.top, left: popup.left }}
+            className={`term-popup pointer-events-auto rounded-xl border border-line bg-canvas p-4 shadow-lg ${
+              popup.isMobile
+                ? "absolute inset-x-0 bottom-0 max-h-[75vh] overflow-y-auto rounded-b-none"
+                : "absolute w-[28rem]"
+            }`}
+            style={
+              popup.isMobile
+                ? undefined
+                : { top: popup.top, left: popup.left }
+            }
           >
             <div className="flex items-start justify-between gap-2">
               <h4 className="text-sm font-semibold text-ink">📘 {popup.term.title}</h4>
@@ -127,7 +146,10 @@ export function ArticleBody({ html, terms }: { html: string; terms: TermInfo[] }
                 ✕
               </button>
             </div>
-            <p className="mt-2 text-sm text-ink-soft">{popup.term.excerpt}</p>
+            <div
+              className="term-popup-body prose prose-sm mt-2 max-h-72 overflow-y-auto pr-1 text-ink-soft"
+              dangerouslySetInnerHTML={{ __html: popup.term.bodyHtml }}
+            />
             {popup.term.tags.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {popup.term.tags.map((t) => (

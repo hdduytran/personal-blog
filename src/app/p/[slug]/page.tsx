@@ -62,6 +62,7 @@ export default async function ArticlePage({
     slug: t.slug,
     title: t.title,
     excerpt: t.excerpt,
+    bodyHtml: t.bodyHtml,
     tags: t.tags,
   }))
 
