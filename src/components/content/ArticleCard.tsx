@@ -10,17 +10,18 @@ function formatDate(d?: string) {
 }
 
 export function ArticleCard({ post, showFolder = true }: { post: Post; showFolder?: boolean }) {
+  const folderName = post.folder.split("/").pop() || post.folder
   return (
     <Link
       href={`/p/${post.slug}`}
       className="group flex gap-4 rounded-xl border border-line p-4 transition-colors hover:bg-hover"
     >
       <div className="hidden h-24 w-36 shrink-0 items-center justify-center rounded-lg bg-hover text-2xl font-semibold text-ink-mute sm:flex">
-        {post.folder.charAt(0).toUpperCase()}
+        {folderName.charAt(0).toUpperCase()}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 text-xs text-ink-mute">
-          {showFolder && <span className="font-medium text-ink-soft">{post.folder}</span>}
+          {showFolder && <span className="font-medium text-ink-soft">{folderName}</span>}
           {post.created && <span>· {formatDate(post.created)}</span>}
           <ReadingTime minutes={post.readingTime} />
         </div>

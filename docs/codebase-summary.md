@@ -6,11 +6,10 @@
 personal-blog/
 ├── content/                  # git submodule (ignored by .gitignore) — Markdown vault
 │   ├── profile.md            # site identity (name, author, socials, SEO, newsletter)
-│   ├── IT/
-│   │   ├── Architectures/*.md  # blog posts
-│   │   ├── notes/*.md          # notes / TIL
-│   │   └── terms/*.md          # glossary terms
-│   └── views/*.yml           # curated content views (Tolaria filters)
+│   ├── terms/*.md            # glossary terms
+│   ├── notes/*.md            # notes / TIL
+│   ├── views/*.yml           # curated content views (Tolaria filters)
+│   └── <top-level-dir>/**    # blog posts (nested dirs → folder tree)
 ├── docs/                     # project documentation (this suite)
 ├── public/                   # static assets (next.svg, vercel.svg, favicon)
 ├── src/
@@ -25,27 +24,27 @@ personal-blog/
 
 ## 2. LOC Table
 
-Measured with `wc -l` across TypeScript/TSX sources (totals ~2,442 lines).
+Measured with `wc -l` across TypeScript/TSX sources (totals ~2,549 lines).
 
 | Directory | LOC | Notes |
 | --------- | --- | ----- |
-| `src/lib` | 774 | Content + markdown + profile + views + helpers |
-| `src/app` | 694 | Routes (TS/TSX) + 207 LOC `globals.css` |
-| `src/components` | 974 | Layout, content, article, terms, seo, ui |
-| **Total** | **~2,442** | excludes CSS (207) |
+| `src/lib` | 855 | Content + markdown + profile + views + helpers |
+| `src/app` | 702 | Routes (TS/TSX) + 207 LOC `globals.css` |
+| `src/components` | 992 | Layout, content, article, terms, seo, ui |
+| **Total** | **~2,549** | excludes CSS (207) |
 
 ### Key modules
 
 | File | LOC | Responsibility |
 | ---- | --- | -------------- |
-| `src/lib/content.ts` | 246 | Loads posts/notes/terms from `content/IT/**`, parses gray-matter, extracts title from first H1, renders markdown, sorts, exports query helpers, caches in a module promise |
+| `src/lib/content.ts` | 254 | Loads posts/notes/terms from any top-level `content/<dir>/**` (posts), `content/notes` (notes), `content/terms` (terms); parses gray-matter, extracts title from first H1, renders markdown, sorts, exports query helpers, caches in a module promise |
 | `src/lib/markdown.ts` | 154 | unified pipeline (remark/rehype), custom `collectToc`/`remarkMermaid`/`remarkWikilink` plugins, `estimateReadingTime`, `plainTextExcerpt` |
 | `src/lib/profile.ts` | 102 | Reads `content/profile.md` → `Profile` object; neutral `FALLBACK` if missing |
 | `src/lib/views.ts` | 150 | YAML view definitions with `all`/`any` filter groups and operators |
-| `src/lib/folders.ts` | 27 | Folder listing from `content/IT` subdirs (excludes `terms`/`notes`/`views`/`attachments`) |
+| `src/lib/folders.ts` | 108 | Hierarchical folder tree built from `content/` top-level dirs and nested subdirs (excludes `terms`/`notes`/`views`/`attachments`) with subtree post counts + direct posts; `getFolderTree`, `getFolders` (flat), `getFolderBySlug` |
 | `src/lib/terms.ts` | 51 | `buildTermMatches` + `highlightTerms` (wraps phrases in `.term-link` spans) |
 | `src/lib/related.ts` | 30 | `scoreRelated` + `getRelatedPosts` heuristic scoring |
-| `src/lib/slug.ts` | 14 | Unicode-aware `slugify` + `fileToSlug` |
+| `src/lib/slug.ts` | 22 | Unicode-aware `slugify` + `fileToSlug` (strips `.md`/`.mdx`) + `pathToSlug` (per-segment slugify joined by `/` for nested folder paths) |
 
 ## 3. Data Flow
 
@@ -76,13 +75,17 @@ module-level promise, and `profile.ts` caches the parsed `Profile`. Every route 
 
 ### src/lib
 
-- **content.ts** — Recursively walks `content/IT`, splitting files into posts (everything
-  except `terms/` and `notes/`), notes (`notes/`), and terms (`terms/`). Strips the first
+- **content.ts** — Walks every top-level directory under `content/` (excluding
+  `terms`, `notes`, `views`, `attachments` and dot-dirs), splitting files into posts;
+  `content/notes` provides notes and `content/terms` provides glossary terms. A post's
+  `folder` is its full relative path (e.g. `IT/Architectures`) and `folderSlug` the
+  slugified path (e.g. `it/architectures`). Strips the first
   H1 as the title, runs the markdown pipeline, normalizes dates, and builds a
   `titleMap` used for `[[wikilink]]` resolution. Query helpers: `getAllPosts`,
-  `getPostBySlug`, `getAllNotes`, `getPostsByFolder`, `getPostsByTag`,
-  `getPostsBySeries`, `getAllSeries`, `getAllTags`, `getFeaturedPosts`, `getAllTerms`,
-  `getTermBySlug`. Unpublished posts (`published: false`) are filtered from public queries.
+  `getPostBySlug`, `getAllNotes`, `getPostsByFolder` (folder + descendants),
+  `getPostsByTag`, `getPostsBySeries`, `getAllSeries`, `getAllTags`,
+  `getFeaturedPosts`, `getAllTerms`, `getTermBySlug`. Unpublished posts
+  (`published: false`) are filtered from public queries.
 - **markdown.ts** — Builds a unified processor: `remarkParse` → `remarkGfm` →
   `remarkWikilink` (resolves `[[Title]]`/`[[Title|label]]` to `/p/slug`) →
   `remarkMermaid` (turns ```mermaid fences into placeholder divs so Shiki ignores them) →
@@ -96,15 +99,19 @@ module-level promise, and `profile.ts` caches the parsed `Profile`. Every route 
   field with operators `equals`, `not_equals`, `contains`, `not_contains`, `any_of`,
   `none_of`, `is_empty`, `is_not_empty`, plus optional `regex: true`. `getViews`
   returns `View[]` with post counts; `getViewPosts` returns the filtered posts.
-- **folders.ts** — Lists subdirectories of `content/IT` (excluding `terms`, `notes`,
-  `views`, `attachments`) with per-folder post counts, for sidebar navigation.
+- **folders.ts** — Walks `content/` top-level dirs and nested subdirectories (excluding
+  `terms`, `notes`, `views`, `attachments` and dot-dirs) into a `FolderNode` tree with
+  subtree post counts and the direct `posts` under each folder; `getFolderTree`
+  (nested), `getFolders` (flattened), `getFolderBySlug` (tree lookup) for sidebar
+  navigation and the `/folder/[...path]` page.
 - **terms.ts** — Builds a phrase list from each term's title + aliases (deduped,
   longest-first) and rewrites article HTML text nodes, wrapping matches in
   `<span class="term-link" data-term-slug="…">` (skipping HTML tags).
 - **related.ts** — Scores candidate posts: same series `+10`, same folder `+5`,
   shared tags `×2`; returns top 4 with a recent-posts fallback when fewer than 3 match.
 - **slug.ts** — `slugify` (lowercase, unicode-aware, non-alphanumeric stripped,
-  spaces → hyphens) and `fileToSlug` (strips `.md`/`.mdx`).
+  spaces → hyphens), `fileToSlug` (strips `.md`/`.mdx`), and `pathToSlug`
+  (slugifies each `/`-separated segment so nested folders keep their hierarchy).
 
 ### src/app (routes)
 
@@ -114,7 +121,7 @@ See `docs/system-architecture.md` for the full routing map and SSG strategy.
 
 | Group | Components | Role |
 | ----- | ---------- | ---- |
-| `layout/` | `AppFrame` (client, mobile drawer + theme init), `MainLayout` (3-col grid), `SidebarLeft` (server nav), `NewsletterBox` | Page chrome |
+| `layout/` | `AppFrame` (client, mobile drawer + theme init + `SidebarResizer`), `MainLayout` (3-col grid), `SidebarLeft` (server nav) + `FolderTree` (client, collapsible), `NewsletterBox` | Page chrome |
 | `content/` | `ActivityFeed`, `ArticleCard`, `NoteCard`, `HomeTabs` (client), `RelatedPosts`, `SeriesNav` | Content listings |
 | `article/` | `SocialShare` (client), `TableOfContents` (client, scroll-spy) | Article extras |
 | `terms/` | `ArticleBody` (client — term popup, copy-heading-link, mermaid) | Article body shell |

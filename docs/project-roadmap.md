@@ -12,7 +12,7 @@ Status legend: **Done** · *In progress* · Planned (parking-lot ideas).
 | Tolaria-style 3-column layout | 260px sidebar / center / 280px right rail, mobile drawer |
 | Markdown pipeline | GFM, `[[wikilinks]]`, mermaid placeholders, Shiki dual-theme, autolink headings |
 | Article page | TOC, reading time, dates, tags, series nav, related posts, social share, breadcrumb, back-to-top, JSON-LD |
-| Term dictionary | `content/IT/terms` → highlighted `.term-link`s + click popup in `ArticleBody` + `/terms` index + `/terms/[slug]` pages |
+| Term dictionary | `content/terms` → highlighted `.term-link`s + click popup in `ArticleBody` + `/terms` index + `/terms/[slug]` pages |
 | Views | YAML-curated filters (`content/views/*.yml`) with `all`/`any` groups |
 | RSS 2.0 feed | `/rss.xml` |
 | Dynamic OG images | `/og/[slug]` via `next/og` |
@@ -41,7 +41,7 @@ Status legend: **Done** · *In progress* · Planned (parking-lot ideas).
 | i18n / multi-language content | Content is `lang="vi"` by default; routing per locale is a larger change |
 | MDX custom components | Currently all Markdown; MDX would allow per-post embedded components |
 | Publish workflow / draft management | `published: false` already hides posts; a small CLI to scaffold a new post would help |
-| Better folder/type taxonomy | `IT/Architectures` is a convention; consider aligning post type tags with Tolaria `type:` field |
+| Better folder/type taxonomy | `content/<top-level-dir>/**` with nested folders already forms a tree at `/folder/[...path]`; consider aligning post type tags with Tolaria `type:` field |
 
 ## 4. Guiding Principles for New Work
 

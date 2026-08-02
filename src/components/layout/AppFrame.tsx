@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
+import { SidebarResizer } from "@/components/layout/SidebarResizer"
 
 const themeInit = `(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();`
 
@@ -34,8 +35,9 @@ export function AppFrame({
       </header>
 
       <div className="mx-auto flex w-full max-w-[1480px]">
-        <aside className="sidebar-w sticky top-0 hidden h-screen shrink-0 overflow-y-auto border-r border-line lg:block">
+        <aside className="sidebar-w relative sticky top-0 hidden h-screen shrink-0 overflow-y-auto border-r border-line lg:block">
           {sidebarLeft}
+          <SidebarResizer />
         </aside>
 
         {open && (

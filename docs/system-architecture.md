@@ -6,8 +6,9 @@
 flowchart LR
     subgraph ContentRepo["content/ (git submodule)"]
         P[profile.md]
-        POSTS[IT/** posts + notes]
-        TERMS[IT/terms glossary]
+        POSTS[<top-level-dir>/** posts]
+        NOTES[notes/*.md]
+        TERMS[terms/*.md glossary]
         VIEWS[views/*.yml]
     end
 
@@ -24,7 +25,7 @@ flowchart LR
     subgraph App["src/app (routes, SSG)"]
         HOME[/]
         ART[/articles/ /notes/ /terms/]
-        FOLDER[/folder/[slug]/]
+        FOLDER[/folder/[...path]/]
         TAG[/tag/[slug]/]
         VIEWPAGE[/view/[slug]/]
         POST[/p/[slug]/]
@@ -42,6 +43,7 @@ flowchart LR
 
     P --> PROF
     POSTS --> CONTENT
+    NOTES --> CONTENT
     TERMS --> CONTENT
     VIEWS --> VIEW
     CONTENT --> MD
@@ -65,13 +67,14 @@ ASCII fallback:
  content/ ──read at build time──▶ src/lib ──▶ src/app (SSG) ──▶ static HTML
    │                                 │                            │
    ├─ profile.md ─▶ profile.ts      │   routes: / /about /articles /notes
-   ├─ IT/** ─────▶ content.ts ──┐   │   /folder/[slug] /tag/[slug] /view/[slug]
-   ├─ IT/terms ─▶ terms.ts      │   │   /terms /terms/[slug] /p/[slug]
-   └─ views/*.yml ─▶ views.ts   │   │   /og/[slug]  /rss.xml
-                                │   │
-   markdown.ts (unified) ◀──────┘   │
+   ├─ <dir>/** ──▶ content.ts ───┐  │   /folder/[...path] /tag/[slug] /view/[slug]
+   ├─ notes/*.md ─▶ content.ts   │  │   /terms /terms/[slug] /p/[slug]
+   ├─ terms/*.md ─▶ terms.ts     │  │   /og/[slug]  /rss.xml
+   └─ views/*.yml ─▶ views.ts    │  │
+                                 │  │
+   markdown.ts (unified) ◀───────┘  │
    related.ts, folders.ts, slug.ts  └── client: ArticleBody / TableOfContents /
-                                        HomeTabs / AppFrame / ThemeToggle
+                                         HomeTabs / AppFrame / ThemeToggle
 ```
 
 ## 2. Build-Time Content Pipeline
@@ -112,7 +115,7 @@ system. There is no runtime API layer.
 | `/about` | page | `profile.aboutContent` | SSG |
 | `/articles` | page | `getAllPosts()` | SSG |
 | `/notes` | page | `getAllNotes()` | SSG |
-| `/folder/[slug]` | page | `getFolders()` → `getPostsByFolder()` | SSG (`generateStaticParams`) |
+| `/folder/[...path]` | page | `getFolderTree()`/`getFolderBySlug()` → `getPostsByFolder()` (folder + descendants) | SSG (`generateStaticParams`) |
 | `/tag/[slug]` | page | `getPostsByTag()` | SSR-on-demand (dynamic, no static params) |
 | `/view/[slug]` | page | `getViews()` → `getViewPosts()` | SSG (`generateStaticParams`) |
 | `/terms` | page | `getAllTerms()` | SSG |

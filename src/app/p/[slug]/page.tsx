@@ -95,7 +95,6 @@ export default async function ArticlePage({
           { label: post.title },
         ]}
       />
-
       <h1 className="text-3xl font-bold tracking-tight text-ink">{post.title}</h1>
 
       <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-ink-mute">

@@ -20,7 +20,7 @@ Follow these when adding or modifying code in `src/`.
 | Files & directories | kebab-case | `content/`, `sidebar-left.tsx`, `activity-feed.tsx` |
 | React component files | kebab-case file, **PascalCase export** | `file: src/components/content/ArticleCard.tsx` |
 | Helper/lib modules | kebab-case | `src/lib/markdown.ts` |
-| Dynamic route folders | `[param]` lowercase | `src/app/folder/[slug]/page.tsx` |
+| Dynamic route folders | `[param]` lowercase, `[...path]` for catch-alls | `src/app/folder/[...path]/page.tsx` |
 | CSS | single global `globals.css` + Tailwind utilities | — |
 
 ## 3. Directory Boundaries

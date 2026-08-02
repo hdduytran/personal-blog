@@ -1,11 +1,12 @@
 import fs from "node:fs"
 import path from "node:path"
 import matter from "gray-matter"
-import { fileToSlug, slugify } from "./slug"
+import { fileToSlug, pathToSlug } from "./slug"
 import { renderMarkdown, estimateReadingTime, plainTextExcerpt } from "./markdown"
 
 const CONTENT_DIR = path.join(process.cwd(), "content")
-const IT_DIR = path.join(CONTENT_DIR, "IT")
+
+const EXCLUDED_DIRS = new Set(["terms", "notes", "views", "attachments"])
 
 export interface Post {
   slug: string
@@ -76,8 +77,10 @@ function readMarkdownFiles(dir: string): string[] {
   const walk = (current: string) => {
     for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
       const full = path.join(current, entry.name)
-      if (entry.isDirectory()) walk(full)
-      else if (/\.mdx?$/i.test(entry.name)) out.push(full)
+      if (entry.isDirectory()) {
+        if (entry.name.startsWith(".") || EXCLUDED_DIRS.has(entry.name)) continue
+        walk(full)
+      } else if (/\.mdx?$/i.test(entry.name)) out.push(full)
     }
   }
   walk(dir)
@@ -104,18 +107,21 @@ async function doLoad(): Promise<Data> {
   const terms: Term[] = []
   const titleMap = new Map<string, string>()
 
-  if (!fs.existsSync(IT_DIR)) return { posts, notes, terms, titleMap }
+  if (!fs.existsSync(CONTENT_DIR)) return { posts, notes, terms, titleMap }
 
-  // Posts: every .md under IT/ except terms/ and notes/
-  const postFiles = readMarkdownFiles(IT_DIR).filter(
-    (f) => !f.includes(path.sep + "terms" + path.sep) && !f.includes(path.sep + "notes" + path.sep)
-  )
   const resolver = buildWikilinkResolver(titleMap)
+
+  // Posts: markdown under every top-level directory except reserved ones
+  const postFiles = fs
+    .readdirSync(CONTENT_DIR, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && !e.name.startsWith(".") && !EXCLUDED_DIRS.has(e.name))
+    .flatMap((e) => readMarkdownFiles(path.join(CONTENT_DIR, e.name)))
+
   for (const file of postFiles) {
     const rawFile = fs.readFileSync(file, "utf8")
     const { data, content } = matter(rawFile)
     const { title, rest } = extractTitle(content, path.basename(file))
-    const folder = path.basename(path.dirname(file))
+    const folder = path.relative(CONTENT_DIR, path.dirname(file)).split(path.sep).join("/")
     const slug = fileToSlug(path.basename(file))
     const { html, toc } = await renderMarkdown(rest, { wikilinkResolver: resolver })
     posts.push({
@@ -124,7 +130,7 @@ async function doLoad(): Promise<Data> {
       description: data.description,
       tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
       folder,
-      folderSlug: slugify(folder),
+      folderSlug: pathToSlug(folder),
       series: data.series,
       seriesOrder: data.series_order ?? data.seriesOrder,
       published: data.published !== false,
@@ -143,7 +149,7 @@ async function doLoad(): Promise<Data> {
   }
 
   // Notes
-  const notesDir = path.join(IT_DIR, "notes")
+  const notesDir = path.join(CONTENT_DIR, "notes")
   for (const file of readMarkdownFiles(notesDir)) {
     const { data, content } = matter(fs.readFileSync(file, "utf8"))
     const { rest } = extractTitle(content, path.basename(file))
@@ -161,7 +167,7 @@ async function doLoad(): Promise<Data> {
   }
 
   // Terms
-  const termsDir = path.join(IT_DIR, "terms")
+  const termsDir = path.join(CONTENT_DIR, "terms")
   for (const file of readMarkdownFiles(termsDir)) {
     const { data, content } = matter(fs.readFileSync(file, "utf8"))
     const { title, rest } = extractTitle(content, path.basename(file))
@@ -205,7 +211,9 @@ export async function getAllNotes(): Promise<Note[]> {
 }
 
 export async function getPostsByFolder(folderSlug: string): Promise<Post[]> {
-  return (await getAllPosts()).filter((p) => p.folderSlug === folderSlug)
+  return (await getAllPosts()).filter(
+    (p) => p.folderSlug === folderSlug || p.folderSlug.startsWith(folderSlug + "/")
+  )
 }
 
 export async function getPostsByTag(tag: string): Promise<Post[]> {

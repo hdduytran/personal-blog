@@ -43,16 +43,17 @@ All content lives under `content/` as plain Markdown with YAML frontmatter:
 | Path | Content type | Required frontmatter |
 | ---- | ------------ | -------------------- |
 | `content/profile.md` | Site identity | `blog_name`, `author_*`, `social[]`, `seo` |
-| `content/IT/**/*.md` | Blog posts | `title` (first H1), `created`, `tags[]`; optional `series`, `series_order`, `featured`, `published`, `cover_image`, `updated`, `type`, `description` |
-| `content/IT/notes/*.md` | Notes / TIL | `created`, `tags[]` |
-| `content/IT/terms/*.md` | Glossary terms | `title`, `aliases[]?`, `definition?`, `tags[]`, `related[]?` |
+| `content/<top-level-dir>/**/*.md` | Blog posts | `title` (first H1), `created`, `tags[]`; optional `series`, `series_order`, `featured`, `published`, `cover_image`, `updated`, `type`, `description` |
+| `content/notes/*.md` | Notes / TIL | `created`, `tags[]` |
+| `content/terms/*.md` | Glossary terms | `title`, `aliases[]?`, `definition?`, `tags[]`, `related[]?` |
 | `content/views/*.yml` | Curated views | `name`, `filters` (Tolaria-style `all`/`any` groups) |
 
 The `content/` directory is a **git submodule** by design (see
 `docs/deployment-guide.md`). It is read at build time by `src/lib/*` and is never
-served as static routes. Note: `IT/Architectures` is the convention for posts in the
-sample vault; any subfolder of `IT/` except `terms/`, `notes/`, `views/`, and
-`attachments/` is treated as a post folder.
+served as static routes. Posts live in **any** top-level directory under `content/`
+(except `terms/`, `notes/`, `views/`, and `attachments/`); nested subdirectories
+form a hierarchical folder tree surfaced at `/folder/<path>`. The sample vault uses
+`IT/` as the post root and `IT/Architectures/` for its architecture posts.
 
 ### 4.2 Zero hardcoded identity
 
@@ -69,7 +70,7 @@ Articles get a first-class reading experience without any per-post setup:
 - Social share (X, Facebook, LinkedIn, copy-link)
 - Related posts (heuristic scoring, see `docs/codebase-summary.md`)
 - Series navigation (prev / next within `series`, ordered by `series_order`)
-- Term-dictionary popups (`content/IT/terms/*` matched in article body)
+- Term-dictionary popups (`content/terms/*` matched in article body)
 - `[[wikilinks]]` resolved to article URLs
 - Mermaid diagram rendering (client-side)
 - Syntax-highlighted code blocks (Shiki, dual light/dark theme)
@@ -120,9 +121,9 @@ only content changes:
 2. `npm install && npm run build && npm run start` builds and serves successfully
    with **no environment variables** and **no source edits**.
 3. The home page shows Activity / Articles / Notes tabs populated from the vault.
-4. Every post in `content/IT/**` is reachable at `/p/[slug]` with a generated article
+4. Every post in any `content/<top-level-dir>/**` is reachable at `/p/[slug]` with a generated article
    page (breadcrumb, dates, reading time, tags, series nav, share, TOC, related).
-5. Glossary terms from `content/IT/terms` render as highlighted, clickable popups in
+5. Glossary terms from `content/terms` render as highlighted, clickable popups in
    article bodies and as pages under `/terms/[slug]`.
 6. `/rss.xml` returns a valid RSS 2.0 feed of published posts.
 7. `/og/[slug]` returns a generated 1200×630 Open Graph image for each post.

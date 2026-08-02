@@ -54,7 +54,7 @@ Because `content/` is a git submodule, tell Vercel to fetch it during the build:
 
 ## 4. Runtime Behavior
 
-- **Static pages** (`/`, `/about`, `/articles`, `/notes`, `/folder/[slug]`,
+- **Static pages** (`/`, `/about`, `/articles`, `/notes`, `/folder/[...path]`,
   `/view/[slug]`, `/terms`, `/terms/[slug]`, `/p/[slug]`) are generated at build time
   and served from Vercel's CDN.
 - **OG images** (`/og/[slug]`) are rendered by `next/og` at build/request time.
