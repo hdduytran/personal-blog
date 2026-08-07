@@ -10,6 +10,7 @@ import { TableOfContents } from "@/components/article/TableOfContents"
 import { RelatedPosts } from "@/components/content/RelatedPosts"
 import { SocialShare } from "@/components/article/SocialShare"
 import { SeriesNav } from "@/components/content/SeriesNav"
+import { PostThumb } from "@/components/content/PostThumb"
 import { BackToTop } from "@/components/ui/BackToTop"
 import { ReadingTime } from "@/components/ui/ReadingTime"
 import { JsonLd } from "@/components/seo/JsonLd"
@@ -121,6 +122,18 @@ export default async function ArticlePage({
       )}
 
       {post.series && <SeriesNav series={post.series} posts={seriesPosts} />}
+
+      {post.coverImage && (
+        <div className="mt-6">
+          <PostThumb
+            coverImage={post.coverImage}
+            icon={post.icon}
+            color={post.color}
+            folder={post.folder}
+            size="hero"
+          />
+        </div>
+      )}
 
       <ArticleBody html={html} terms={termData} />
 

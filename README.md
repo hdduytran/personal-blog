@@ -85,10 +85,18 @@ git commit -m "chore: add content submodule"
 | File | Purpose | Key frontmatter |
 | ---- | ------- | --------------- |
 | `content/profile.md` | Site identity | `blog_name`, `author`, `bio`, `socials[]` |
-| `content/IT/Architectures/*.md` | Posts | `title`, `created`, `tags[]`, `series?`, `featured?`, `summary?` |
-| `content/IT/Notes/*.md` | Notes / TIL | `title`, `created`, `tags[]` |
+| `content/IT/Architectures/*.md` | Posts | `title`, `created`, `tags[]`, `series?`, `featured?`, `summary?`, `icon?`, `color?`, `cover_image?` |
+| `content/IT/Notes/*.md` | Notes / TIL | `title`, `created`, `tags[]`, `icon?`, `color?` |
 | `content/IT/Terms/*.md` | Glossary terms | `title`, `aliases?`, `tags[]`, `excerpt` |
+| `content/attachments/**` | Vault media | Served at `/media/<path>` (images, videos, files) |
 | `content/views/*.yml` | Curated views | Tolaria filters (`match: all|any` on `tags`/`series`/`folder`) |
+
+**Cover images & icons:** post/note thumbnails are Tolaria-aligned. The cover is
+either `cover_image` or the **first inline image** in the note body; if there is no
+image, the list card falls back to an **auto-generated thumbnail** at `/card/<slug>`
+(title tile tinted by `color`, built with `next/og` like the OG images). Media stored
+in `content/attachments/` is served from `/media/<path>` and refs like
+`attachments/foo.png` in markdown are rewritten automatically.
 
 ### Without a submodule (quick local)
 

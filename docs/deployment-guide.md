@@ -60,6 +60,10 @@ Because `content/` is a git submodule, tell Vercel to fetch it during the build:
 - **OG images** (`/og/[slug]`) are rendered by `next/og` at build/request time.
 - **RSS feed** (`/rss.xml`) is generated on request with `Cache-Control:
   s-maxage=3600, stale-while-revalidate`.
+- **Vault media** (`/media/[...path]`) is served on demand from
+  `content/attachments/**`. Because it ships inside the content submodule, cover
+  images and inline media deploy automatically with the site — no separate upload
+  step. Ensure the submodule is included (see §3) so attachments are present at build.
 
 ## 5. After Deployment
 

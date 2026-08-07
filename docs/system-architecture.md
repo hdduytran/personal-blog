@@ -122,7 +122,9 @@ system. There is no runtime API layer.
 | `/terms/[slug]` | page | `getTermBySlug()` + related terms | SSG (`generateStaticParams`) |
 | `/p/[slug]` | page | `getPostBySlug()` + related + terms | SSG (`generateStaticParams`) |
 | `/og/[slug]` | route | `getPostBySlug()` + profile (next/og `ImageResponse`) | Static params, nodejs runtime |
+| `/card/[slug]` | route | `getPostBySlug()` + profile (next/og `ImageResponse`, 384×216 card thumbnail) | Static params, nodejs runtime |
 | `/rss.xml` | route | `getAllPosts()` + profile (XML `Response`) | Dynamic (on-request), cached |
+| `/media/[...path]` | route | File read from `content/attachments/<path>` | Dynamic file stream, immutable cache |
 
 ### 3.1 SSR/SSG strategy
 

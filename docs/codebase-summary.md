@@ -9,6 +9,7 @@ personal-blog/
 │   ├── terms/*.md            # glossary terms
 │   ├── notes/*.md            # notes / TIL
 │   ├── views/*.yml           # curated content views (Tolaria filters)
+│   ├── attachments/**        # vault media, served at /media/<path> (not scanned as posts)
 │   └── <top-level-dir>/**    # blog posts (nested dirs → folder tree)
 ├── docs/                     # project documentation (this suite)
 ├── public/                   # static assets (next.svg, vercel.svg, favicon)
@@ -64,7 +65,7 @@ Post[] / Note[] / Term[] / Profile / View[]  (cached in module promise)
 src/app/*  routes (SSG at build) + src/components/* (render)
    │
    ├── client interactivity (ArticleBody, HomeTabs, ThemeToggle, AppFrame…)
-   └── special routes: /og/[slug] (ImageResponse), /rss.xml (XML Response)
+   └── special routes: /og/[slug] (ImageResponse), /card/[slug] (ImageResponse card), /rss.xml (XML Response), /media/[...path] (vault attachments)
 ```
 
 All content is read **once** and cached: `content.ts` caches the loaded `Data` in a

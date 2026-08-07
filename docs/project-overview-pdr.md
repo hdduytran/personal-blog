@@ -43,7 +43,7 @@ All content lives under `content/` as plain Markdown with YAML frontmatter:
 | Path | Content type | Required frontmatter |
 | ---- | ------------ | -------------------- |
 | `content/profile.md` | Site identity | `blog_name`, `author_*`, `social[]`, `seo` |
-| `content/<top-level-dir>/**/*.md` | Blog posts | `title` (first H1), `created`, `tags[]`; optional `series`, `series_order`, `featured`, `published`, `cover_image`, `updated`, `type`, `description` |
+| `content/<top-level-dir>/**/*.md` | Blog posts | `title` (first H1), `created`, `tags[]`; optional `series`, `series_order`, `featured`, `published`, `cover_image`, `updated`, `type`, `description`, `icon`, `color` |
 | `content/notes/*.md` | Notes / TIL | `created`, `tags[]` |
 | `content/terms/*.md` | Glossary terms | `title`, `aliases[]?`, `definition?`, `tags[]`, `related[]?` |
 | `content/views/*.yml` | Curated views | `name`, `filters` (Tolaria-style `all`/`any` groups) |
@@ -84,6 +84,40 @@ A Tolaria-style 3-column layout:
 - **Center column** — page content (cards, article body, tabs).
 - **Right rail (280px)** — newsletter, table of contents, related posts. Sticky, hidden on mobile.
 
+### 4.5 Cover images & icons (Tolaria-aligned)
+
+Post and note thumbnails follow the **Tolaria vault convention** so content stays
+readable and reusable outside the site. Each post/note may carry an optional
+`icon` + `color` (both `_icon`/`_color` are also accepted) and an cover:
+
+| Frontmatter | Meaning |
+| ----------- | ------- |
+| `cover_image` | Explicit cover path (e.g. `/media/banner.png`) |
+| `icon` / `_icon` | Per-note icon: lucide/Phosphor kebab-case name, an emoji, or an image URL |
+| `color` / `_color` | Accent color for the fallback badge (e.g. `#3b82f6` or `blue`) |
+
+**Resolution order** for a thumbnail:
+
+1. `cover_image`, else the **first inline image** found in the note body;
+2. if no image, the **auto-generated card** at `/card/<slug>` (built with `next/og`,
+   reuse of the OG generator): renders the note title on a dark tile tinted by
+   `color`, with the Tolaria `icon` when it's an emoji;
+3. if image generation is unavailable, fall back to the CSS badge: `icon` (emoji
+   first, then a lucide icon by name), else the first letter of the folder name,
+   tinted with `color`.
+
+**Where it shows** — the list card (`ArticleCard`/`PostThumb`) always resolves the
+thumbnail above; the article hero on the post page only renders when a **real**
+image exists (`cover_image` or a body image), never the generated card. This lets
+you manage a post's "cover" purely by dropping a lead image in the body or by
+setting `icon`/`color` in frontmatter, with no code changes.
+
+**Vault media:** `content/attachments/**` is served as static files at
+`/media/<path>` (see `src/app/media/[...path]/route.ts`). Image refs written as
+`attachments/foo.png` in markdown are automatically rewritten to `/media/foo.png`
+during render (`src/lib/markdown.ts`), so the same file works locally and on the
+deployed site. Unlike note directories, `attachments/` is never scanned as posts.
+
 ## 5. Feature List
 
 | Area | Feature | Implementation |
@@ -92,6 +126,7 @@ A Tolaria-style 3-column layout:
 | Rendering | Markdown → HTML | unified/remark/rehype pipeline (`src/lib/markdown.ts`) |
 | SEO | Dynamic metadata, JSON-LD (`BlogPosting`) | `generateMetadata`, `JsonLd.tsx` |
 | SEO | Open Graph images | `src/app/og/[slug]/route.tsx` (next/og) |
+| Content | Auto-generated card thumbnails | `src/app/card/[slug]/route.tsx` (next/og) |
 | Distribution | RSS 2.0 feed | `src/app/rss.xml/route.ts` |
 | UX | Dark mode | `data-theme` attribute + `localStorage` |
 | UX | Term dictionary popups | `src/lib/terms.ts` + `ArticleBody.tsx` |

@@ -1,6 +1,7 @@
 import Link from "next/link"
 import type { Post } from "@/lib/content"
 import { ReadingTime } from "@/components/ui/ReadingTime"
+import { PostThumb } from "@/components/content/PostThumb"
 
 function formatDate(d?: string) {
   if (!d) return ""
@@ -16,8 +17,14 @@ export function ArticleCard({ post, showFolder = true }: { post: Post; showFolde
       href={`/p/${post.slug}`}
       className="group flex gap-4 rounded-xl border border-line p-4 transition-colors hover:bg-hover"
     >
-      <div className="hidden h-24 w-36 shrink-0 items-center justify-center rounded-lg bg-hover text-2xl font-semibold text-ink-mute sm:flex">
-        {folderName.charAt(0).toUpperCase()}
+      <div className="hidden sm:block">
+        <PostThumb
+          coverImage={post.coverImage}
+          icon={post.icon}
+          color={post.color}
+          folder={post.folder}
+          cardHref={`/card/${post.slug}`}
+        />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 text-xs text-ink-mute">

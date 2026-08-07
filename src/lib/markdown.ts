@@ -20,11 +20,14 @@ export interface TocItem {
 
 export interface RenderOptions {
   wikilinkResolver?: (title: string) => string | null
+  /** Remove the first inline image from the rendered body (used when it doubles as the cover). */
+  stripCover?: boolean
 }
 
 export interface RenderResult {
   html: string
   toc: TocItem[]
+  cover?: string
 }
 
 function textContent(node: any): string {
@@ -41,6 +44,34 @@ const collectToc: Plugin<[], Root> = () => (tree, file) => {
     if (/^h[2-4]$/.test(node.tagName)) {
       const id = (node.properties?.id as string) || ""
       toc.push({ depth: Number(node.tagName[1]), text: textContent(node), id })
+    }
+  })
+}
+
+// Rewrite Tolaria attachment references to the served /media route and record the
+// first image as the post cover. When `stripCover` is set, that cover image is also
+// removed from the body so it doesn't render twice (hero + inline). Assumes vault
+// media lives in <root>/attachments.
+const remarkMedia: Plugin<[{ out?: { cover?: string }; stripCover?: boolean }]> = (
+  options
+) => (tree: any) => {
+  const out = options?.out
+  const stripCover = options?.stripCover
+  visit(tree, "image", (node: any, index, parent) => {
+    const raw: string = String(node.url || "")
+    const src = raw.replace(/\\/g, "/")
+    // Only rewrite local vault references (e.g. attachments/foo.png, ../../attachments/foo.png).
+    if (!/^(https?:)?\/\//i.test(src)) {
+      const stripped = src.replace(/^(?:\.\.?\/)+/, "")
+      const idx = stripped.indexOf("attachments/")
+      node.url =
+        idx >= 0 ? `/media/${stripped.slice(idx + "attachments/".length)}` : src
+    }
+    if (out && !out.cover && /\.(png|jpe?g|gif|webp|avif|svg)$/i.test(node.url)) {
+      out.cover = node.url
+      if (stripCover && parent && typeof index === "number") {
+        parent.children.splice(index, 1)
+      }
     }
   })
 }
@@ -98,11 +129,12 @@ const remarkWikilink: Plugin<[RenderOptions?]> = (options) => (tree: any) => {
   })
 }
 
-function buildProcessor(options: RenderOptions) {
+function buildProcessor(options: RenderOptions, out?: { cover?: string }) {
   return unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkWikilink, options)
+    .use(remarkMedia, { out, stripCover: options.stripCover })
     .use(remarkMermaid)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeSlug)
@@ -123,10 +155,11 @@ export async function renderMarkdown(
   raw: string,
   options: RenderOptions = {}
 ): Promise<RenderResult> {
-  const proc = buildProcessor(options)
+  const out: { cover?: string } = {}
+  const proc = buildProcessor(options, out)
   const file = await proc.process(raw)
   const toc = ((file as any).data?.toc as TocItem[]) || []
-  return { html: String(file), toc }
+  return { html: String(file), toc, cover: out.cover }
 }
 
 // Reading time from raw markdown (strip code fences + markdown syntax).

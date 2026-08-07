@@ -6,7 +6,7 @@ import { renderMarkdown, estimateReadingTime, plainTextExcerpt } from "./markdow
 
 const CONTENT_DIR = path.join(process.cwd(), "content")
 
-const EXCLUDED_DIRS = new Set(["terms", "notes", "views", "attachments"])
+const EXCLUDED_DIRS = new Set(["terms", "notes", "views"])
 
 export interface Post {
   slug: string
@@ -20,6 +20,8 @@ export interface Post {
   published: boolean
   featured: boolean
   coverImage?: string
+  icon?: string
+  color?: string
   created?: string
   updated?: string
   bodyHtml: string
@@ -35,6 +37,9 @@ export interface Note {
   created?: string
   published: boolean
   tags: string[]
+  coverImage?: string
+  icon?: string
+  color?: string
   bodyHtml: string
   raw: string
   readingTime: number
@@ -123,7 +128,11 @@ async function doLoad(): Promise<Data> {
     const { title, rest } = extractTitle(content, path.basename(file))
     const folder = path.relative(CONTENT_DIR, path.dirname(file)).split(path.sep).join("/")
     const slug = fileToSlug(path.basename(file))
-    const { html, toc } = await renderMarkdown(rest, { wikilinkResolver: resolver })
+    const explicitCover = data.cover_image ?? data.coverImage
+    const { html, toc, cover } = await renderMarkdown(rest, {
+      wikilinkResolver: resolver,
+      stripCover: !explicitCover,
+    })
     posts.push({
       slug,
       title,
@@ -135,7 +144,9 @@ async function doLoad(): Promise<Data> {
       seriesOrder: data.series_order ?? data.seriesOrder,
       published: data.published !== false,
       featured: Boolean(data.featured),
-      coverImage: data.cover_image ?? data.coverImage,
+      coverImage: explicitCover ?? cover,
+      icon: data.icon ?? data._icon,
+      color: data.color ?? data._color,
       created: normalizeDate(data.created),
       updated: normalizeDate(data.updated),
       bodyHtml: html,
@@ -153,12 +164,15 @@ async function doLoad(): Promise<Data> {
   for (const file of readMarkdownFiles(notesDir)) {
     const { data, content } = matter(fs.readFileSync(file, "utf8"))
     const { rest } = extractTitle(content, path.basename(file))
-    const { html } = await renderMarkdown(rest, { wikilinkResolver: resolver })
+    const { html, cover } = await renderMarkdown(rest, { wikilinkResolver: resolver })
     notes.push({
       slug: fileToSlug(path.basename(file)),
       created: normalizeDate(data.created),
       published: data.published !== false,
       tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+      coverImage: data.cover_image ?? data.coverImage ?? cover,
+      icon: data.icon ?? data._icon,
+      color: data.color ?? data._color,
       bodyHtml: html,
       raw: rest,
       readingTime: estimateReadingTime(rest),
