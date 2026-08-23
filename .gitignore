@@ -41,4 +41,5 @@ yarn-error.log*
 next-env.d.ts
 
 # content is provided as a git submodule (see README)
+
 # /content/
